@@ -1,381 +1,513 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#10111b">
-<title>CLARIO AI</title>
+<meta name="theme-color" content="#090d18">
+<title>CLARIO AI | ZELQORA Technologies</title>
 
 <style>
-*{box-sizing:border-box}
-
-body{
- margin:0;
- background:#10111b;
- color:#f5f5fa;
- font-family:Arial,sans-serif;
- height:100dvh;
- overflow:hidden;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-.app{
- display:flex;
- height:100dvh;
+body {
+  font-family: Arial, sans-serif;
+  background: #090d18;
+  color: #f4f6ff;
+  min-height: 100vh;
 }
 
-.sidebar{
- width:255px;
- background:#171825;
- padding:20px 14px;
- display:flex;
- flex-direction:column;
- border-right:1px solid #292a3b;
+.app {
+  display: flex;
+  min-height: 100vh;
 }
 
-.brand{
- font-size:25px;
- font-weight:bold;
- letter-spacing:2px;
- color:#a99aff;
- padding:8px;
+.sidebar {
+  width: 245px;
+  background: #101727;
+  padding: 24px 16px;
+  border-right: 1px solid #263149;
+  display: flex;
+  flex-direction: column;
 }
 
-.brand small{
- display:block;
- color:#77788c;
- font-size:10px;
- letter-spacing:3px;
- margin-top:5px;
+.brand {
+  font-size: 27px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: #80aaff;
+  margin-bottom: 5px;
 }
 
-.newchat{
- background:#8170e9;
- color:white;
- border:0;
- padding:13px;
- border-radius:10px;
- margin:25px 0;
- font-weight:bold;
+.brand-sub {
+  color: #8591a9;
+  font-size: 11px;
+  margin-bottom: 35px;
 }
 
-.navtitle{
- color:#77788c;
- font-size:11px;
- margin:15px 8px 8px;
+.new-chat {
+  background: #315cbd;
+  color: white;
+  border: none;
+  padding: 13px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 25px;
 }
 
-.navitem{
- padding:12px;
- border-radius:9px;
- color:#c7c7d5;
- margin:3px 0;
- font-size:14px;
+.nav-title {
+  font-size: 11px;
+  color: #73809b;
+  margin: 15px 8px;
+  text-transform: uppercase;
 }
 
-.navitem.active{
- background:#29263f;
- color:#b9aaff;
+.nav-item {
+  padding: 12px;
+  border-radius: 9px;
+  color: #b5bfd3;
+  margin-bottom: 5px;
+  font-size: 14px;
 }
 
-.sidebarbottom{
- margin-top:auto;
- padding:12px;
- color:#9999ad;
- font-size:12px;
+.nav-item.active {
+  background: #1d3158;
+  color: white;
 }
 
-.main{
- flex:1;
- display:flex;
- flex-direction:column;
- min-width:0;
+.sidebar-footer {
+  margin-top: auto;
+  color: #8290a9;
+  font-size: 11px;
+  line-height: 1.7;
 }
 
-.topbar{
- height:65px;
- display:flex;
- align-items:center;
- justify-content:space-between;
- padding:0 20px;
- border-bottom:1px solid #292a3b;
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100vh;
 }
 
-.topbar strong{font-size:15px}
-.version{color:#88899c;font-size:11px}
-
-.messages{
- flex:1;
- overflow-y:auto;
- padding:25px 16px;
- display:flex;
- flex-direction:column;
- align-items:center;
+.topbar {
+  padding: 19px 25px;
+  border-bottom: 1px solid #263149;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.welcome{
- text-align:center;
- margin:auto 0;
- max-width:550px;
+.topbar-title {
+  font-size: 15px;
+  font-weight: bold;
 }
 
-.logo{
- width:65px;
- height:65px;
- border-radius:20px;
- display:grid;
- place-items:center;
- margin:auto;
- background:linear-gradient(135deg,#8170e9,#3e9edb);
- font-size:29px;
- font-weight:bold;
+.status {
+  color: #65dca3;
+  font-size: 12px;
 }
 
-.welcome h1{
- font-size:30px;
- margin:22px 0 8px;
+.content {
+  width: 100%;
+  max-width: 850px;
+  margin: auto;
+  padding: 35px 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.welcome p{
- color:#9697aa;
- font-size:14px;
- line-height:1.6;
+.welcome {
+  text-align: center;
+  margin: auto 0;
 }
 
-.suggestions{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:10px;
- margin-top:25px;
+.logo {
+  width: 75px;
+  height: 75px;
+  margin: 0 auto 22px;
+  background: linear-gradient(135deg, #4779ed, #8d55ed);
+  border-radius: 23px;
+  display: grid;
+  place-items: center;
+  font-size: 36px;
+  font-weight: bold;
+  box-shadow: 0 10px 40px #345dc955;
 }
 
-.suggestion{
- background:#1a1c2b;
- border:1px solid #303146;
- color:#c9c9d8;
- border-radius:12px;
- padding:14px;
- text-align:left;
- font-size:12px;
+.welcome h1 {
+  font-size: 32px;
+  margin-bottom: 12px;
 }
 
-.conversation{
- width:100%;
- max-width:720px;
+.welcome p {
+  color: #929db2;
+  line-height: 1.6;
+  font-size: 14px;
 }
 
-.message{
- padding:15px;
- margin:12px 0;
- border-radius:14px;
- line-height:1.6;
- font-size:14px;
- white-space:pre-wrap;
- overflow-wrap:anywhere;
+.suggestions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 35px;
 }
 
-.user{
- background:#302b50;
- margin-left:auto;
- max-width:85%;
+.suggestion {
+  background: #141f33;
+  border: 1px solid #293a59;
+  border-radius: 12px;
+  padding: 17px;
+  text-align: left;
+  color: #dce5fa;
+  cursor: pointer;
+  font-size: 13px;
 }
 
-.assistant{
- background:#1c2030;
- margin-right:auto;
- max-width:95%;
+.suggestion:hover {
+  background: #1b2c4b;
 }
 
-.composerarea{
- padding:12px 16px 20px;
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding-bottom: 25px;
 }
 
-.composer{
- max-width:720px;
- margin:auto;
- background:#1b1d2c;
- border:1px solid #3a3b51;
- border-radius:16px;
- padding:10px;
+.message {
+  max-width: 85%;
+  padding: 15px 17px;
+  border-radius: 15px;
+  line-height: 1.65;
+  font-size: 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
-textarea{
- width:100%;
- resize:none;
- min-height:45px;
- max-height:130px;
- background:transparent;
- border:0;
- outline:none;
- color:white;
- padding:10px;
- font:14px Arial;
+.message.user {
+  align-self: flex-end;
+  background: #294e9c;
 }
 
-.composerbottom{
- display:flex;
- justify-content:space-between;
- align-items:center;
- padding:5px;
+.message.assistant {
+  align-self: flex-start;
+  background: #151f31;
+  border: 1px solid #273650;
 }
 
-.hint{
- color:#77788c;
- font-size:10px;
+.message-label {
+  display: block;
+  font-size: 10px;
+  color: #9eafd0;
+  margin-bottom: 7px;
+  font-weight: bold;
 }
 
-.send{
- background:#8170e9;
- color:white;
- border:0;
- border-radius:10px;
- padding:11px 18px;
- font-weight:bold;
+.composer {
+  padding: 15px 20px 22px;
+  width: 100%;
+  max-width: 850px;
+  margin: auto;
 }
 
-.disclaimer{
- text-align:center;
- color:#77788c;
- font-size:10px;
- margin-top:10px;
+.input-box {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  background: #151f31;
+  border: 1px solid #334362;
+  padding: 10px;
+  border-radius: 15px;
 }
 
-.mobilebrand{display:none}
+textarea {
+  flex: 1;
+  background: transparent;
+  color: white;
+  border: none;
+  outline: none;
+  resize: none;
+  min-height: 40px;
+  max-height: 130px;
+  padding: 11px 5px;
+  font-family: inherit;
+  font-size: 14px;
+}
 
-@media(max-width:650px){
- .sidebar{display:none}
- .mobilebrand{display:block;color:#a99aff;font-weight:bold}
- .topbar{padding:0 14px}
- .welcome h1{font-size:25px}
- .suggestions{grid-template-columns:1fr 1fr}
- .composerarea{padding:10px}
+textarea::placeholder {
+  color: #8290a9;
+}
+
+.send {
+  width: 43px;
+  height: 43px;
+  border: none;
+  border-radius: 11px;
+  background: #4779ed;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.send:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.disclaimer {
+  color: #75819a;
+  text-align: center;
+  font-size: 10px;
+  margin-top: 12px;
+}
+
+@media(max-width:700px) {
+  .sidebar {
+    display: none;
+  }
+
+  .topbar {
+    padding: 17px;
+  }
+
+  .content {
+    padding: 25px 15px;
+  }
+
+  .welcome h1 {
+    font-size: 27px;
+  }
+
+  .suggestions {
+    grid-template-columns: 1fr;
+  }
+
+  .message {
+    max-width: 94%;
+  }
+
+  .composer {
+    padding: 12px;
+  }
 }
 </style>
 </head>
 
 <body>
+
 <div class="app">
 
-<aside class="sidebar">
- <div class="brand">
-  CLARIO
-  <small>ARTIFICIAL INTELLIGENCE</small>
- </div>
+  <aside class="sidebar">
+    <div class="brand">CLARIO</div>
+    <div class="brand-sub">INTELLIGENCE REIMAGINED</div>
 
- <button class="newchat" onclick="newChat()">＋ New conversation</button>
-
- <div class="navtitle">WORKSPACE</div>
- <div class="navitem active">✦ AI Chat</div>
- <div class="navitem">⌘ Code Assistant</div>
- <div class="navitem">◈ Research</div>
- <div class="navitem">▧ Documents</div>
- <div class="navitem">✧ AI Studio</div>
- <div class="navitem">◎ Voice Assistant</div>
-
- <div class="sidebarbottom">
-  A ZELQORA TECHNOLOGIES PRODUCT<br><br>
-  CLARIO AI · Version 1.0
- </div>
-</aside>
-
-<main class="main">
-
- <header class="topbar">
-  <strong class="mobilebrand">✦ CLARIO AI</strong>
-  <strong class="desktopbrand">AI Assistant</strong>
-  <span class="version">PREVIEW 1.0</span>
- </header>
-
- <section class="messages" id="messages">
-
-  <div class="welcome" id="welcome">
-   <div class="logo">C</div>
-   <h1>Welcome to CLARIO.</h1>
-   <p>Your intelligent workspace starts here.<br>
-   Ask questions, explore ideas and create something amazing.</p>
-
-   <div class="suggestions">
-    <button class="suggestion" onclick="suggest('Teach me something interesting today.')">
-     ✦ Learn something new
+    <button class="new-chat" onclick="newChat()">
+      + New conversation
     </button>
-    <button class="suggestion" onclick="suggest('Help me write a JavaScript program.')">
-     ⌘ Write some code
-    </button>
-    <button class="suggestion" onclick="suggest('Help me organise my day.')">
-     ◷ Plan my day
-    </button>
-    <button class="suggestion" onclick="suggest('Explain a difficult topic simply.')">
-     ◈ Explain a topic
-    </button>
-   </div>
-  </div>
 
-  <div class="conversation" id="conversation"></div>
+    <div class="nav-title">Workspace</div>
+    <div class="nav-item active">✦ AI Chat</div>
+    <div class="nav-item">⌘ Code Assistant</div>
+    <div class="nav-item">⌕ Research</div>
+    <div class="nav-item">▤ Documents</div>
+    <div class="nav-item">✧ AI Studio</div>
+    <div class="nav-item">◉ Voice Assistant</div>
 
- </section>
+    <div class="sidebar-footer">
+      Developed by<br>
+      <strong>ZELQORA TECHNOLOGIES</strong><br>
+      Building Tomorrow's Digital Future.
+    </div>
+  </aside>
 
- <section class="composerarea">
-  <div class="composer">
-   <textarea id="prompt" placeholder="Message CLARIO..." rows="1"></textarea>
-   <div class="composerbottom">
-    <span class="hint">CLARIO AI · Your intelligent assistant</span>
-    <button class="send" onclick="sendMessage()">Send ↑</button>
-   </div>
-  </div>
-  <div class="disclaimer">
-   AI can make mistakes. Verify important information.
-  </div>
- </section>
+  <main class="main">
 
-</main>
+    <header class="topbar">
+      <div class="topbar-title">CLARIO AI</div>
+      <div class="status">● AI Workspace</div>
+    </header>
+
+    <section class="content">
+
+      <div class="welcome" id="welcome">
+        <div class="logo">C</div>
+
+        <h1>Meet CLARIO.</h1>
+
+        <p>
+          Your intelligent AI companion.<br>
+          Ask questions, explore ideas, learn and create.
+        </p>
+
+        <div class="suggestions">
+          <button class="suggestion"
+            onclick="useSuggestion('Teach me something interesting today.')">
+            ✦ Teach me something interesting
+          </button>
+
+          <button class="suggestion"
+            onclick="useSuggestion('Help me write a professional business plan.')">
+            ◈ Write a business plan
+          </button>
+
+          <button class="suggestion"
+            onclick="useSuggestion('Help me understand JavaScript programming.')">
+            ⌘ Teach me programming
+          </button>
+
+          <button class="suggestion"
+            onclick="useSuggestion('Explain a difficult topic in simple terms.')">
+            ◉ Explain something difficult
+          </button>
+        </div>
+      </div>
+
+      <div class="messages" id="messages"></div>
+
+    </section>
+
+    <div class="composer">
+      <div class="input-box">
+        <textarea
+          id="promptBox"
+          placeholder="Message CLARIO..."
+          rows="1"
+        ></textarea>
+
+        <button class="send" id="sendButton"
+          onclick="sendMessage()">↑</button>
+      </div>
+
+      <div class="disclaimer">
+        CLARIO can make mistakes. Verify important information.
+      </div>
+    </div>
+
+  </main>
 </div>
 
 <script>
-const promptBox=document.getElementById("prompt");
-const conversation=document.getElementById("conversation");
-const welcome=document.getElementById("welcome");
+const promptBox = document.getElementById("promptBox");
+const messages = document.getElementById("messages");
+const welcome = document.getElementById("welcome");
+const sendButton = document.getElementById("sendButton");
 
-function addMessage(text,type){
- const message=document.createElement("div");
- message.className="message "+type;
- message.textContent=text;
- conversation.appendChild(message);
- document.getElementById("messages").scrollTop=
- document.getElementById("messages").scrollHeight;
+let chatHistory = [];
+let isSending = false;
+
+function addMessage(text, sender) {
+  const bubble = document.createElement("div");
+  bubble.className = "message " + sender;
+
+  const label = document.createElement("span");
+  label.className = "message-label";
+  label.textContent = sender === "user" ? "YOU" : "CLARIO";
+
+  const content = document.createElement("div");
+  content.textContent = text;
+
+  bubble.appendChild(label);
+  bubble.appendChild(content);
+
+  messages.appendChild(bubble);
+
+  bubble.scrollIntoView({
+    behavior: "smooth",
+    block: "end"
+  });
+
+  return content;
 }
 
-function sendMessage(){
- const text=promptBox.value.trim();
- if(!text)return;
+async function sendMessage() {
+  const text = promptBox.value.trim();
 
- welcome.style.display="none";
- addMessage(text,"user");
- promptBox.value="";
+  if (!text || isSending) return;
 
- setTimeout(()=>{
-  addMessage(
-   "I'm currently in preview mode. My real AI model has not been connected yet. Once we connect CLARIO's secure AI backend, I'll be able to answer your questions intelligently.",
-   "assistant"
-  );
- },500);
+  welcome.style.display = "none";
+
+  addMessage(text, "user");
+
+  promptBox.value = "";
+  promptBox.style.height = "auto";
+
+  isSending = true;
+  sendButton.disabled = true;
+
+  const loading = addMessage("CLARIO is thinking...", "assistant");
+
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: text,
+        history: chatHistory
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "AI request failed");
+    }
+
+    if (!data.reply) {
+      throw new Error("No AI response received");
+    }
+
+    loading.textContent = data.reply;
+
+    chatHistory.push(
+      { role: "user", content: text },
+      { role: "assistant", content: data.reply }
+    );
+
+  } catch (error) {
+    console.error(error);
+
+    loading.textContent =
+      "Sorry, CLARIO couldn't connect to its AI service. Please try again.";
+  }
+
+  isSending = false;
+  sendButton.disabled = false;
+  promptBox.focus();
 }
 
-function suggest(text){
- promptBox.value=text;
- sendMessage();
-}
-
-function newChat(){
- conversation.innerHTML="";
- welcome.style.display="block";
- promptBox.value="";
-}
-
-promptBox.addEventListener("keydown",function(e){
- if(e.key==="Enter"&&!e.shiftKey){
-  e.preventDefault();
+function useSuggestion(text) {
+  promptBox.value = text;
   sendMessage();
- }
+}
+
+function newChat() {
+  messages.innerHTML = "";
+  chatHistory = [];
+  welcome.style.display = "block";
+  promptBox.value = "";
+}
+
+promptBox.addEventListener("keydown", function(event) {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    sendMessage();
+  }
+});
+
+promptBox.addEventListener("input", function() {
+  this.style.height = "auto";
+  this.style.height = Math.min(this.scrollHeight, 130) + "px";
 });
 </script>
+
 </body>
 </html>
