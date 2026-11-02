@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,678 +5,600 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#090d18">
 <title>CLARIO AI | ZELQORA Technologies</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Arial,sans-serif;background:#090d18;color:#f4f6ff;min-height:100vh}
-button,input,textarea{font-family:inherit}
-button{cursor:pointer}
+button,input,textarea,select{font-family:inherit}button{cursor:pointer}
 .app{display:flex;min-height:100vh}
 .sidebar{width:255px;background:#101727;padding:20px 14px;border-right:1px solid #263149;display:flex;flex-direction:column;flex-shrink:0}
-.brand{font-size:27px;font-weight:bold;letter-spacing:2px;color:#80aaff}
-.brand-sub{color:#8591a9;font-size:10px;margin:5px 0 25px}
+.brand{font-size:27px;font-weight:bold;letter-spacing:2px;color:#80aaff}.brand-sub{color:#8591a9;font-size:10px;margin:5px 0 25px}
 .new-chat{background:#315cbd;color:white;border:0;padding:13px;border-radius:10px;margin-bottom:18px}
 .nav-title{font-size:10px;color:#73809b;margin:14px 9px;text-transform:uppercase}
 .nav-item{width:100%;text-align:left;background:transparent;border:0;padding:12px;border-radius:9px;color:#b5bfd3;margin-bottom:5px;font-size:13px}
 .nav-item.active,.nav-item:hover{background:#1d3158;color:white}
-.history-list{max-height:260px;overflow-y:auto}
-.history-item{display:flex;align-items:center;gap:5px;margin:4px 0}
+.history-list{max-height:260px;overflow-y:auto}.history-item{display:flex;align-items:center;gap:5px;margin:4px 0}
 .history-open{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;background:transparent;border:0;color:#aebbd1;padding:9px;font-size:12px;border-radius:7px}
-.history-open:hover{background:#1d2940;color:white}
-.delete-chat{background:transparent;border:0;color:#8591a9;padding:7px}
+.history-open:hover{background:#1d2940;color:white}.delete-chat{background:transparent;border:0;color:#8591a9;padding:7px}
 .sidebar-footer{margin-top:auto;color:#8290a9;font-size:10px;line-height:1.8;padding-top:15px}
-.account-area{border-top:1px solid #293650;margin-top:15px;padding-top:13px}
-.account-email{font-size:11px;color:#aebbd1;overflow-wrap:anywhere;margin-bottom:9px}
+.account-area{border-top:1px solid #293650;margin-top:15px;padding-top:13px}.account-email{font-size:11px;color:#aebbd1;overflow-wrap:anywhere;margin-bottom:9px}
 .small-button{background:#263650;color:white;border:0;padding:9px 12px;border-radius:8px;font-size:11px}
 .main{flex:1;min-width:0;display:flex;flex-direction:column;min-height:100vh}
 .topbar{padding:18px 24px;border-bottom:1px solid #263149;display:flex;justify-content:space-between;align-items:center}
-.topbar-title{font-size:15px;font-weight:bold}
-.status{color:#65dca3;font-size:11px}
+.topbar-title{font-size:15px;font-weight:bold}.status{color:#65dca3;font-size:11px}
 .content{width:100%;max-width:900px;margin:auto;padding:28px 20px;flex:1}
-.page{display:none}
-.page.active{display:block}
-.welcome{text-align:center;margin:35px auto}
-.logo{width:72px;height:72px;margin:0 auto 20px;background:linear-gradient(135deg,#4779ed,#8d55ed);border-radius:22px;display:grid;place-items:center;font-size:35px;font-weight:bold}
-h1{font-size:30px;margin-bottom:12px}
-.subtitle{color:#929db2;font-size:14px;line-height:1.7}
+.page{display:none}.page.active{display:block}
+.welcome{text-align:center;margin:35px auto}.logo{width:72px;height:72px;margin:0 auto 20px;background:linear-gradient(135deg,#4779ed,#8d55ed);border-radius:22px;display:grid;place-items:center;font-size:35px;font-weight:bold}
+h1{font-size:30px;margin-bottom:12px}.subtitle{color:#929db2;font-size:14px;line-height:1.7}
 .suggestions{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:30px auto;max-width:650px}
 .suggestion,.tool-card{background:#141f33;border:1px solid #293a59;border-radius:12px;padding:16px;text-align:left;color:#dce5fa}
 .suggestion:hover,.tool-card:hover{background:#1b2c4b}
 .messages{display:flex;flex-direction:column;gap:20px;padding:15px 0 25px}
 .message{max-width:88%;padding:15px;border-radius:14px;line-height:1.65;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}
-.message.user{align-self:flex-end;background:#294e9c}
-.message.assistant{align-self:flex-start;background:#151f31;border:1px solid #273650}
+.message.user{align-self:flex-end;background:#294e9c}.message.assistant{align-self:flex-start;background:#151f31;border:1px solid #273650}
 .message-label{display:block;font-size:10px;color:#9eafd0;margin-bottom:7px;font-weight:bold}
+.message-actions{display:flex;gap:8px;margin-top:10px}.message-actions button{background:#263650;color:#dce5fa;border:0;padding:6px 9px;border-radius:7px;font-size:11px}
 .composer{padding:14px 20px 20px;width:100%;max-width:900px;margin:auto}
-.input-box{display:flex;align-items:flex-end;gap:10px;background:#151f31;border:1px solid #334362;padding:10px;border-radius:15px}
+.input-box{display:flex;align-items:flex-end;gap:8px;background:#151f31;border:1px solid #334362;padding:10px;border-radius:15px}
 textarea{flex:1;background:transparent;color:white;border:0;outline:none;resize:none;min-height:40px;max-height:130px;padding:11px 5px;font-size:14px}
-textarea::placeholder{color:#8290a9}
-.send{width:43px;height:43px;border:0;border-radius:11px;background:#4779ed;color:white;font-size:20px}
-.send:disabled{opacity:.5}
+textarea::placeholder{color:#8290a9}.send,.mic{width:43px;height:43px;border:0;border-radius:11px;background:#4779ed;color:white;font-size:20px}
+.mic{background:#263650;font-size:17px}.mic.listening{background:#b83252}.send:disabled{opacity:.5}
 .disclaimer{text-align:center;color:#75819a;font-size:10px;margin-top:10px}
-.page-heading{font-size:25px;margin:12px 0}
-.page-description{color:#929db2;font-size:13px;line-height:1.6;margin-bottom:24px}
-.tool-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
-.tool-card{min-height:125px}
-.tool-card strong{display:block;margin-bottom:10px;font-size:15px}
-.tool-card span{color:#9eabc1;font-size:12px;line-height:1.5}
+.page-heading{font-size:25px;margin:12px 0}.page-description{color:#929db2;font-size:13px;line-height:1.6;margin-bottom:24px}
+.tool-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.tool-card{min-height:125px}
+.tool-card strong{display:block;margin-bottom:10px;font-size:15px}.tool-card span{color:#9eabc1;font-size:12px;line-height:1.5}
 .workspace-panel{background:#141f33;border:1px solid #293a59;border-radius:14px;padding:20px;margin-top:18px}
 .workspace-panel p{font-size:13px;color:#aebbd1;line-height:1.7;margin:10px 0 15px}
 .primary-button{background:#4779ed;color:white;border:0;border-radius:9px;padding:12px 16px}
-.bottom-nav{display:none}
+.field{width:100%;background:#090f1d;border:1px solid #334362;color:white;padding:12px;border-radius:9px;margin:8px 0 14px;outline:none}
+.field-label{display:block;color:#b5bfd3;font-size:12px;margin-top:12px}
+.studio-output{margin-top:18px}.studio-output img{display:block;max-width:100%;height:auto;border-radius:12px;border:1px solid #334362}
+.voice-orb{width:110px;height:110px;border-radius:50%;margin:25px auto;background:linear-gradient(135deg,#4779ed,#8d55ed);display:grid;place-items:center;font-size:42px}
+.voice-status{text-align:center;color:#aebbd1;font-size:13px;margin:15px}
 .auth-screen{position:fixed;inset:0;background:#090d18;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
 .auth-card{width:100%;max-width:420px;background:#121d30;border:1px solid #293a59;border-radius:18px;padding:28px}
 .auth-logo{font-size:30px;font-weight:bold;letter-spacing:3px;color:#80aaff;text-align:center;margin-bottom:5px}
 .auth-sub{text-align:center;color:#8290a9;font-size:12px;margin-bottom:25px}
-.auth-card h2{font-size:22px;margin-bottom:8px}
-.auth-description{color:#929db2;font-size:13px;line-height:1.5;margin-bottom:20px}
+.auth-card h2{font-size:22px;margin-bottom:8px}.auth-description{color:#929db2;font-size:13px;line-height:1.5;margin-bottom:20px}
 .auth-card label{display:block;font-size:12px;color:#b5bfd3;margin:14px 0 7px}
 .auth-card input{width:100%;background:#090f1d;border:1px solid #334362;color:white;padding:13px;border-radius:9px;outline:none}
-.auth-card input:focus{border-color:#6492ff}
-.auth-submit{width:100%;background:#4779ed;color:white;border:0;padding:14px;border-radius:9px;margin-top:20px;font-weight:bold}
-.auth-switch{text-align:center;color:#929db2;font-size:12px;margin-top:18px}
-.auth-switch button{background:none;border:0;color:#80aaff}
-.auth-message{font-size:12px;line-height:1.5;margin-top:13px;color:#ffb9b9;overflow-wrap:anywhere}
-.auth-message.success{color:#65dca3}
+.auth-card input:focus{border-color:#6492ff}.auth-submit{width:100%;background:#4779ed;color:white;border:0;padding:14px;border-radius:9px;margin-top:20px;font-weight:bold}
+.auth-switch{text-align:center;color:#929db2;font-size:12px;margin-top:18px}.auth-switch button{background:none;border:0;color:#80aaff}
+.auth-message{font-size:12px;line-height:1.5;margin-top:13px;color:#ffb9b9;overflow-wrap:anywhere}.auth-message.success{color:#65dca3}
 .hidden{display:none!important}
+.bottom-nav{display:none}
 @media(max-width:700px){
-.sidebar{display:none}
-.topbar{padding:16px}
-.content{padding:20px 14px 15px}
-h1{font-size:26px}
-.suggestions,.tool-grid{grid-template-columns:1fr}
-.message{max-width:95%}
-.composer{padding:10px 12px 8px}
+.sidebar{display:none}.topbar{padding:16px}.content{padding:20px 14px 15px}h1{font-size:26px}
+.suggestions,.tool-grid{grid-template-columns:1fr}.message{max-width:95%}.composer{padding:10px 12px 8px}
 .bottom-nav{display:flex;position:sticky;bottom:0;background:#101727;border-top:1px solid #293650;justify-content:space-around;padding:8px 2px calc(8px + env(safe-area-inset-bottom));z-index:5}
 .bottom-nav button{background:transparent;border:0;color:#94a1b8;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:5px}
-.bottom-nav button.active{color:#80aaff}
-.bottom-nav .nav-icon{font-size:18px}
+.bottom-nav button.active{color:#80aaff}.bottom-nav .nav-icon{font-size:18px}
 }
 </style>
 </head>
-
 <body>
+<div class="auth-screen" id="authScreen"><div class="auth-card">
+<div class="auth-logo">CLARIO</div><div class="auth-sub">INTELLIGENCE REIMAGINED</div>
+<div id="loginForm"><h2>Welcome back</h2><p class="auth-description">Sign in to continue your conversations with CLARIO.</p>
+<label>Email address</label><input id="loginEmail" type="email" placeholder="you@example.com" autocomplete="email">
+<label>Password</label><input id="loginPassword" type="password" placeholder="Your password" autocomplete="current-password">
+<button class="auth-submit" id="loginButton" onclick="login()">Sign in</button>
+<div class="auth-switch">New to CLARIO? <button onclick="showAuthForm('signup')">Create an account</button></div>
+<div class="auth-switch"><button onclick="showAuthForm('reset')">Forgot your password?</button></div></div>
+<div id="signupForm" class="hidden"><h2>Create your account</h2><p class="auth-description">Join CLARIO and save your AI conversations.</p>
+<label>Your name</label><input id="signupName" type="text" placeholder="Your name" autocomplete="name">
+<label>Email address</label><input id="signupEmail" type="email" placeholder="you@example.com" autocomplete="email"><label>Password</label><input id="signupPassword" type="password" placeholder="At least 6 characters" autocomplete="new-password">
+<button class="auth-submit" id="signupButton" onclick="signup()">Create account</button>
+<div class="auth-switch">Already registered? <button onclick="showAuthForm('login')">Sign in</button></div></div>
+<div id="resetForm" class="hidden"><h2>Reset password</h2><p class="auth-description">We'll send a password reset link to your email.</p>
+<label>Email address</label><input id="resetEmail" type="email" placeholder="you@example.com">
+<button class="auth-submit" onclick="resetPassword()">Send reset link</button>
+<div class="auth-switch"><button onclick="showAuthForm('login')">Back to sign in</button></div></div>
+<div id="authMessage" class="auth-message"></div>
+</div></div>
 
-<!-- LOGIN AND REGISTRATION -->
-<div class="auth-screen" id="authScreen">
-  <div class="auth-card">
-    <div class="auth-logo">CLARIO</div>
-    <div class="auth-sub">INTELLIGENCE REIMAGINED</div>
-
-    <div id="loginForm">
-      <h2>Welcome back</h2>
-      <p class="auth-description">Sign in to continue your conversations with CLARIO.</p>
-
-      <label>Email address</label>
-      <input id="loginEmail" type="email" placeholder="you@example.com" autocomplete="email">
-
-      <label>Password</label>
-      <input id="loginPassword" type="password" placeholder="Your password" autocomplete="current-password">
-
-      <button class="auth-submit" id="loginButton" onclick="login()">Sign in</button>
-
-      <div class="auth-switch">
-        New to CLARIO? <button onclick="showAuthForm('signup')">Create an account</button>
-      </div>
-      <div class="auth-switch">
-        <button onclick="showAuthForm('reset')">Forgot your password?</button>
-      </div>
-    </div>
-
-    <div id="signupForm" class="hidden">
-      <h2>Create your account</h2>
-      <p class="auth-description">Join CLARIO and save your AI conversations.</p>
-
-      <label>Your name</label>
-      <input id="signupName" type="text" placeholder="Your name" autocomplete="name">
-
-      <label>Email address</label>
-      <input id="signupEmail" type="email" placeholder="you@example.com" autocomplete="email">
-
-      <label>Password</label>
-      <input id="signupPassword" type="password" placeholder="At least 8 characters" autocomplete="new-password">
-
-      <button class="auth-submit" id="signupButton" onclick="signup()">Create account</button>
-
-      <div class="auth-switch">
-        Already registered? <button onclick="showAuthForm('login')">Sign in</button>
-      </div>
-    </div>
-
-    <div id="resetForm" class="hidden">
-      <h2>Reset password</h2>
-      <p class="auth-description">Enter your email and we'll send a password reset link.</p>
-
-      <label>Email address</label>
-      <input id="resetEmail" type="email" placeholder="you@example.com">
-
-      <button class="auth-submit" onclick="resetPassword()">Send reset link</button>
-
-      <div class="auth-switch">
-        <button onclick="showAuthForm('login')">Back to sign in</button>
-      </div>
-    </div>
-
-    <div class="auth-message" id="authMessage"></div>
-  </div>
-</div>
-
-<div class="app" id="app" style="display:none">
-
+<div class="app hidden" id="app">
 <aside class="sidebar">
-  <div class="brand">CLARIO</div>
-  <div class="brand-sub">INTELLIGENCE REIMAGINED</div>
-
-  <button class="new-chat" onclick="newChat()">＋ New conversation</button>
-
-  <div class="nav-title">AI Workspace</div>
-  <button class="nav-item active" data-page="chat" onclick="showPage('chat')">✦ AI Chat</button>
-  <button class="nav-item" data-page="code" onclick="showPage('code')">⌘ Code Assistant</button>
-  <button class="nav-item" data-page="research" onclick="showPage('research')">⌕ Research</button>
-  <button class="nav-item" data-page="documents" onclick="showPage('documents')">▤ Documents</button>
-  <button class="nav-item" data-page="studio" onclick="showPage('studio')">✧ AI Studio</button>
-  <button class="nav-item" data-page="voice" onclick="showPage('voice')">◉ Voice Assistant</button>
-  <button class="nav-item" data-page="learn" onclick="showPage('learn')">◎ CLARIO Learn</button>
-
-  <div class="nav-title">Your conversations</div>
-  <div class="history-list" id="historyList"></div>
-
-  <div class="account-area">
-    <div class="account-email" id="accountEmail"></div>
-    <button class="small-button" onclick="logout()">Sign out</button>
-  </div>
-
-  <div class="sidebar-footer">
-    Developed by<br><strong>ZELQORA TECHNOLOGIES</strong><br>
-    Building Tomorrow's Digital Future.
-  </div>
+<div class="brand">CLARIO AI</div><div class="brand-sub">BY ZELQORA TECHNOLOGIES</div>
+<button class="new-chat" onclick="newChat()">＋ New conversation</button>
+<div class="nav-title">Workspace</div>
+<button class="nav-item active" data-page="chat" onclick="showPage('chat')">✦ &nbsp; AI Assistant</button>
+<button class="nav-item" data-page="code" onclick="showPage('code')">⌘ &nbsp; Code Assistant</button>
+<button class="nav-item" data-page="research" onclick="showPage('research')">◎ &nbsp; Research</button>
+<button class="nav-item" data-page="documents" onclick="showPage('documents')">▤ &nbsp; Documents</button>
+<button class="nav-item" data-page="studio" onclick="showPage('studio')">✧ &nbsp; AI Studio</button>
+<button class="nav-item" data-page="voice" onclick="showPage('voice')">◉ &nbsp; Voice Assistant</button>
+<button class="nav-item" data-page="learn" onclick="showPage('learn')">⌑ &nbsp; Learn</button>
+<div class="nav-title">Recent conversations</div>
+<div class="history-list" id="historyList"></div>
+<div class="sidebar-footer">Building Tomorrow's Digital Future.<div class="account-area">
+<div class="account-email" id="accountEmail"></div>
+<button class="small-button" onclick="logout()">Sign out</button>
+</div></div>
 </aside>
 
 <main class="main">
-<header class="topbar">
-  <div class="topbar-title" id="topTitle">CLARIO AI</div>
-  <div class="status">● Online</div>
-</header>
-
+<header class="topbar"><div class="topbar-title" id="pageTitle">AI Assistant</div><div class="status">● Online</div></header>
 <div class="content">
 
 <section class="page active" id="page-chat">
-  <div class="welcome" id="welcome">
-    <div class="logo">C</div>
-    <h1>Meet CLARIO.</h1>
-    <p class="subtitle">Your intelligent AI companion.<br>Ask questions, explore ideas, learn and create.</p>
-    <div class="suggestions">
-      <button class="suggestion" onclick="useSuggestion('Teach me something interesting today.')">✦ Teach me something interesting</button>
-      <button class="suggestion" onclick="useSuggestion('Help me write a professional business plan.')">◈ Write a business plan</button>
-      <button class="suggestion" onclick="useSuggestion('Help me understand JavaScript programming.')">⌘ Teach me programming</button>
-      <button class="suggestion" onclick="useSuggestion('Explain a difficult topic in simple terms.')">◎ Explain something difficult</button>
-    </div>
-  </div>
-  <div class="messages" id="messages"></div>
+<div class="welcome" id="welcome">
+<div class="logo">C</div><h1>What can I help you with?</h1>
+<p class="subtitle">Your ideas deserve intelligent answers.<br>Ask CLARIO anything.</p>
+<div class="suggestions">
+<button class="suggestion" onclick="useSuggestion('Explain a difficult topic in simple terms.')">📚 Explain something to me</button>
+<button class="suggestion" onclick="useSuggestion('Help me write a professional document.')">✍️ Help me write</button>
+<button class="suggestion" onclick="useSuggestion('Help me solve a programming problem.')">💻 Help me code</button>
+<button class="suggestion" onclick="useSuggestion('Research an interesting topic and summarise it.')">🔎 Research a topic</button>
+</div></div>
+<div class="messages" id="messages"></div>
 </section>
 
 <section class="page" id="page-code">
-  <h1 class="page-heading">⌘ Code Assistant</h1>
-  <p class="page-description">Build software, understand code, debug errors and learn programming with CLARIO.</p>
-  <div class="tool-grid">
-    <button class="tool-card" onclick="askTool('Help me write a new program. Ask me what I want to build.')"><strong>＋ Create code</strong><span>Start a new programming project.</span></button>
-    <button class="tool-card" onclick="askTool('Help me debug my code. Ask me to provide the code and error.')"><strong>⚙ Debug code</strong><span>Find and explain programming errors.</span></button>
-    <button class="tool-card" onclick="askTool('Teach me programming step by step, starting with the basics.')"><strong>◎ Learn coding</strong><span>Learn programming from the beginning.</span></button>
-    <button class="tool-card" onclick="askTool('Explain how APIs work and show me an example.')"><strong>⌘ Understand APIs</strong><span>Learn how software systems connect.</span></button>
-  </div>
+<h2 class="page-heading">Code Assistant</h2>
+<p class="page-description">Get help writing, understanding, debugging and improving code.</p>
+<div class="workspace-panel"><strong>What are you building?</strong><p>Describe your coding problem or paste your code into the chat below. CLARIO can help you work through it step by step.</p>
+<button class="primary-button" onclick="startWorkspace('Help me with a coding task. Explain the solution step by step.')">Start coding</button></div>
 </section>
 
 <section class="page" id="page-research">
-  <h1 class="page-heading">⌕ CLARIO Research</h1>
-  <p class="page-description">Explore questions, understand subjects and organise information.</p>
-  <div class="workspace-panel">
-    <strong>Start your research</strong>
-    <p>Ask CLARIO to explain a subject, compare ideas or prepare a structured research outline.</p>
-    <button class="primary-button" onclick="askTool('Help me research a topic. Ask me which topic I want to investigate.')">Start research</button>
-  </div>
+<h2 class="page-heading">Research</h2>
+<p class="page-description">Explore ideas, understand topics and organise your research.</p>
+<div class="workspace-panel"><strong>Research assistant</strong><p>Ask a question, request an explanation, or ask CLARIO to organise information into useful sections. Answers may need independent fact-checking.</p>
+<button class="primary-button" onclick="startWorkspace('Help me research a topic. Ask me what topic I want to explore.')">Start research</button></div>
 </section>
 
 <section class="page" id="page-documents">
-  <h1 class="page-heading">▤ Documents</h1>
-  <p class="page-description">Get help drafting, improving and understanding written documents.</p>
-  <div class="workspace-panel">
-    <strong>Document workspace</strong>
-    <p>Document upload and automatic file analysis are planned for a later update. For now, paste text into the chat.</p>
-    <button class="primary-button" onclick="askTool('Help me write or improve a document. Ask what type of document I need.')">Write a document</button>
-  </div>
+<h2 class="page-heading">Documents</h2>
+<p class="page-description">Create, improve and organise written documents.</p>
+<div class="workspace-panel"><strong>Document assistant</strong><p>Draft reports, proposals, letters, notes and other documents with CLARIO.</p>
+<button class="primary-button" onclick="startWorkspace('Help me create a document. Ask me what kind of document I need.')">Create a document</button></div>
 </section>
 
 <section class="page" id="page-studio">
-  <h1 class="page-heading">✧ AI Studio</h1>
-  <p class="page-description">Your creative workspace for AI-powered visual ideas.</p>
-  <div class="workspace-panel">
-    <strong>Creative assistant</strong>
-    <p>Image generation and image editing are planned features. Start by developing an image concept or prompt.</p>
-    <button class="primary-button" onclick="askTool('Help me develop a detailed creative image prompt. Ask what image I want to create.')">Create an image concept</button>
-  </div>
-</section>
+<h2 class="page-heading">AI Studio</h2>
+<p class="page-description">Turn your imagination into images using an AI image model.</p>
+<div class="workspace-panel">
+<strong>Image generation</strong>
+<label class="field-label" for="imagePrompt">Describe the image you want</label>
+<textarea class="field" id="imagePrompt" rows="4" placeholder="Example: A futuristic African city at sunset, cinematic lighting, highly detailed..."></textarea>
+<label class="field-label" for="imageSize">Image shape</label>
+<select class="field" id="imageSize"><option value="square">Square</option><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select>
+<button class="primary-button" id="generateButton" onclick="generateImage()">✧ Generate image</button>
+<div id="imageStatus" class="voice-status"></div>
+<div id="imageOutput" class="studio-output"></div>
+</div></section>
 
 <section class="page" id="page-voice">
-  <h1 class="page-heading">◉ Voice Assistant</h1>
-  <p class="page-description">A future voice conversation workspace.</p>
-  <div class="workspace-panel">
-    <strong>Voice features coming later</strong>
-    <p>Live voice conversations are not connected yet.</p>
-    <button class="primary-button" onclick="showPage('chat')">Open AI Chat</button>
-  </div>
-</section>
+<h2 class="page-heading">Voice Assistant</h2>
+<p class="page-description">Talk to CLARIO and hear its responses aloud.</p>
+<div class="workspace-panel">
+<div class="voice-orb">🎙</div>
+<div class="voice-status" id="voiceStatus">Tap the microphone to start speaking.</div>
+<div style="text-align:center"><button class="primary-button" id="voiceButton" onclick="toggleVoice()">🎙 Start listening</button></div>
+<p>Your spoken words will be sent to the AI assistant, and its response will be read aloud. Microphone support depends on your browser.</p>
+</div></section>
 
 <section class="page" id="page-learn">
-  <h1 class="page-heading">◎ CLARIO Learn</h1>
-  <p class="page-description">Learn new subjects with explanations, examples and practice questions.</p>
-  <div class="tool-grid">
-    <button class="tool-card" onclick="askTool('Teach me a subject step by step. Ask which subject I am studying.')"><strong>▤ Lessons</strong><span>Understand topics in simple steps.</span></button>
-    <button class="tool-card" onclick="askTool('Give me a practice quiz. First ask me which subject and difficulty.')"><strong>✎ Practice quiz</strong><span>Test your understanding.</span></button>
-    <button class="tool-card" onclick="askTool('Help me create a study plan for my subject.')"><strong>◷ Study planner</strong><span>Organise your learning.</span></button>
-    <button class="tool-card" onclick="askTool('Help me memorise important facts using flashcards.')"><strong>▣ Flashcards</strong><span>Practise remembering key facts.</span></button>
-  </div>
+<h2 class="page-heading">Learn</h2>
+<p class="page-description">Understand new subjects with explanations tailored to your level.</p>
+<div class="workspace-panel"><strong>Your learning companion</strong><p>Ask for lessons, examples, practice questions or step-by-step explanations.</p>
+<button class="primary-button" onclick="startWorkspace('Act as my personal tutor. Ask me what subject I want to learn and my current level.')">Start learning</button></div>
 </section>
-
 </div>
 
 <div class="composer" id="composer">
-  <div class="input-box">
-    <textarea id="promptBox" placeholder="Message CLARIO..." rows="1"></textarea>
-    <button class="send" id="sendButton" onclick="sendMessage()">↑</button>
-  </div>
-  <div class="disclaimer">CLARIO can make mistakes. Verify important information.</div>
+<div class="input-box">
+<button class="mic" id="chatMic" onclick="toggleDictation()" title="Dictate message">🎙</button>
+<textarea id="userInput" rows="1" placeholder="Message CLARIO..."></textarea>
+<button class="send" id="sendButton" onclick="sendMessage()">➤</button>
+</div>
+<div class="disclaimer">CLARIO AI can make mistakes. Check important information.</div>
 </div>
 
 <nav class="bottom-nav">
-  <button class="active" data-page="chat" onclick="showPage('chat')"><span class="nav-icon">✦</span>Chat</button>
-  <button data-page="code" onclick="showPage('code')"><span class="nav-icon">⌘</span>Code</button>
-  <button data-page="research" onclick="showPage('research')"><span class="nav-icon">⌕</span>Research</button>
-  <button data-page="studio" onclick="showPage('studio')"><span class="nav-icon">✧</span>Studio</button>
-  <button data-page="learn" onclick="showPage('learn')"><span class="nav-icon">◎</span>Learn</button>
+<button class="active" data-page="chat" onclick="showPage('chat')"><span class="nav-icon">✦</span>Chat</button>
+<button data-page="code" onclick="showPage('code')"><span class="nav-icon">⌘</span>Code</button>
+<button data-page="studio" onclick="showPage('studio')"><span class="nav-icon">✧</span>Studio</button>
+<button data-page="voice" onclick="showPage('voice')"><span class="nav-icon">◉</span>Voice</button>
+<button data-page="learn" onclick="showPage('learn')"><span class="nav-icon">⌑</span>Learn</button>
 </nav>
-
 </main>
-</div>
-
-<script>
-/* SUPABASE CONNECTION */
+</div><script>
 const SUPABASE_URL = "https://rxbgskxrcgwbovcxovqs.supabase.co";
 const SUPABASE_KEY = "sb_publishable_UZHseC22kb5wUzakKmJofA_MjIPBS0F";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* APP STATE */
-const promptBox=document.getElementById("promptBox");
-const messages=document.getElementById("messages");
-const welcome=document.getElementById("welcome");
-const sendButton=document.getElementById("sendButton");
-const composer=document.getElementById("composer");
-const topTitle=document.getElementById("topTitle");
+let currentUser = null;
+let currentConversation = null;
+let conversations = [];
+let chatHistory = [];
+let busy = false;
+let recognition = null;
+let voiceRecognition = null;
+let voiceMode = false;
 
-let currentUser=null;
-let currentConversation=null;
-let chatHistory=[];
-let isSending=false;
-let currentPage="chat";
-
-const pageNames={
-chat:"CLARIO AI",code:"Code Assistant",research:"CLARIO Research",
-documents:"Documents",studio:"AI Studio",voice:"Voice Assistant",learn:"CLARIO Learn"
-};
-
-function authMessage(text,success=false){
-const el=document.getElementById("authMessage");
-el.textContent=text;
-el.className="auth-message"+(success?" success":"");
+function showAuthForm(which) {
+  ["loginForm","signupForm","resetForm"].forEach(id =>
+    document.getElementById(id).classList.toggle("hidden",
+      id !== ({login:"loginForm",signup:"signupForm",reset:"resetForm"}[which]))
+  );
+  document.getElementById("authMessage").textContent = "";
+  document.getElementById("authMessage").className = "auth-message";
 }
 
-function showAuthForm(name){
-["loginForm","signupForm","resetForm"].forEach(id=>{
-document.getElementById(id).classList.add("hidden");
-});
-document.getElementById(name+"Form").classList.remove("hidden");
-authMessage("");
+function authNotice(message, success=false) {
+  const el = document.getElementById("authMessage");
+  el.textContent = message;
+  el.className = "auth-message" + (success ? " success" : "");
 }
 
-function setBusy(id,busy){
-const button=document.getElementById(id);
-button.disabled=busy;
-button.textContent=busy?"Please wait...":(
-id==="loginButton"?"Sign in":"Create account"
-);
+async function login() {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  if (!email || !password) return authNotice("Enter your email and password.");
+  const button = document.getElementById("loginButton");
+  button.disabled = true; button.textContent = "Signing in...";
+  const {data,error} = await supabaseClient.auth.signInWithPassword({email,password});
+  button.disabled = false; button.textContent = "Sign in";
+  if (error) return authNotice(error.message);
+  currentUser = data.user;
+  await enterApp();
 }
 
-async function signup(){
-const name=document.getElementById("signupName").value.trim();
-const email=document.getElementById("signupEmail").value.trim();
-const password=document.getElementById("signupPassword").value;
-
-if(!name||!email||password.length<8){
-authMessage("Enter your name, a valid email and a password of at least 8 characters.");
-return;
+async function signup() {
+  const name = document.getElementById("signupName").value.trim();
+  const email = document.getElementById("signupEmail").value.trim();
+  const password = document.getElementById("signupPassword").value;
+  if (!name || !email || !password) return authNotice("Complete all fields.");
+  if (password.length < 6) return authNotice("Password must contain at least 6 characters.");
+  const button = document.getElementById("signupButton");
+  button.disabled = true; button.textContent = "Creating account...";
+  const {data,error} = await supabaseClient.auth.signUp({
+    email,password,options:{data:{full_name:name}}
+  });
+  button.disabled = false; button.textContent = "Create account";
+  if (error) return authNotice(error.message);
+  if (data.session) {
+    currentUser = data.user;
+    await enterApp();
+  } else {
+    authNotice("Account created. Check your email to confirm your address, then sign in.",true);
+    showAuthForm("login");
+  }
 }
 
-setBusy("signupButton",true);
-try{
-const {data,error}=await supabaseClient.auth.signUp({
-email,password,
-options:{data:{full_name:name}}
-});
-if(error)throw error;
-
-if(data.session){
-await enterApp(data.session.user);
-}else{
-authMessage("Account created! Check your email for a confirmation link, then return here to sign in.",true);
-}
-}catch(error){
-authMessage(error.message||"Registration failed.");
-}finally{
-setBusy("signupButton",false);
-}
+async function resetPassword() {
+  const email = document.getElementById("resetEmail").value.trim();
+  if (!email) return authNotice("Enter your email address.");
+  const {error} = await supabaseClient.auth.resetPasswordForEmail(email,{
+    redirectTo:location.origin
+  });
+  if (error) return authNotice(error.message);
+  authNotice("Password reset link sent. Check your email.",true);
 }
 
-async function login(){
-const email=document.getElementById("loginEmail").value.trim();
-const password=document.getElementById("loginPassword").value;
-
-if(!email||!password){
-authMessage("Enter your email and password.");
-return;
+async function logout() {
+  await supabaseClient.auth.signOut();
+  location.reload();
 }
 
-setBusy("loginButton",true);
-try{
-const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
-if(error)throw error;
-await enterApp(data.user);
-}catch(error){
-authMessage(error.message||"Login failed.");
-}finally{
-setBusy("loginButton",false);
-}
+async function enterApp() {
+  document.getElementById("authScreen").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  document.getElementById("accountEmail").textContent = currentUser.email || "";
+  await loadConversations();
+  if (!currentConversation) newChat();
 }
 
-async function resetPassword(){
-const email=document.getElementById("resetEmail").value.trim();
-if(!email){authMessage("Enter your email address.");return;}
-try{
-const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{
-redirectTo:window.location.origin
-});
-if(error)throw error;
-authMessage("Password reset email sent. Check your inbox.",true);
-}catch(error){
-authMessage(error.message||"Could not send reset email.");
-}
+async function loadConversations() {
+  const {data,error} = await supabaseClient.from("conversations")
+    .select("*").eq("user_id",currentUser.id)
+    .order("updated_at",{ascending:false}).limit(50);
+  if (error) { console.error(error); return; }
+  conversations = data || [];
+  renderHistory();
 }
 
-async function logout(){
-await supabaseClient.auth.signOut();
-currentUser=null;
-currentConversation=null;
-chatHistory=[];
-document.getElementById("app").style.display="none";
-document.getElementById("authScreen").style.display="flex";
-showAuthForm("login");
+function renderHistory() {
+  const list = document.getElementById("historyList");
+  list.innerHTML = "";
+  conversations.forEach(c => {
+    const row = document.createElement("div");
+    row.className = "history-item";
+    const open = document.createElement("button");
+    open.className = "history-open";
+    open.textContent = c.title || "New conversation";
+    open.onclick = () => openConversation(c.id);
+    const del = document.createElement("button");
+    del.className = "delete-chat";
+    del.textContent = "×";
+    del.title = "Delete conversation";
+    del.onclick = () => deleteConversation(c.id);
+    row.append(open,del);
+    list.appendChild(row);
+  });
 }
 
-async function enterApp(user){
-currentUser=user;
-document.getElementById("authScreen").style.display="none";
-document.getElementById("app").style.display="flex";
-document.getElementById("accountEmail").textContent=user.email||"Signed in";
-await loadConversations();
-newChat();
+async function newChat() {
+  if (!currentUser) return;
+  const {data,error} = await supabaseClient.from("conversations")
+    .insert({user_id:currentUser.id,title:"New conversation"})
+    .select().single();
+  if (error) { alert(error.message); return; }
+  currentConversation = data.id;
+  chatHistory = [];
+  document.getElementById("messages").innerHTML = "";
+  document.getElementById("welcome").classList.remove("hidden");
+  await loadConversations();
+  showPage("chat");
 }
 
-async function checkSession(){
-const {data,error}=await supabaseClient.auth.getSession();
-if(error){authMessage("Could not check your session. Please sign in.");return;}
-if(data.session){
-await enterApp(data.session.user);
-}
-}
-
-supabaseClient.auth.onAuthStateChange((event,session)=>{
-if(event==="SIGNED_OUT"){
-currentUser=null;
-document.getElementById("app").style.display="none";
-document.getElementById("authScreen").style.display="flex";
-}
-});
-
-/* NAVIGATION */
-function showPage(name){
-currentPage=name;
-document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-document.getElementById("page-"+name).classList.add("active");
-document.querySelectorAll("[data-page]").forEach(b=>{
-b.classList.toggle("active",b.dataset.page===name);
-});
-topTitle.textContent=pageNames[name];
-composer.style.display=["voice","documents","studio"].includes(name)?"none":"block";
+async function openConversation(id) {
+  currentConversation = id;
+  const {data,error} = await supabaseClient.from("messages")
+    .select("*").eq("conversation_id",id)
+    .eq("user_id",currentUser.id).order("created_at",{ascending:true});
+  if (error) { alert(error.message); return; }
+  chatHistory = (data || []).map(m => ({role:m.role,content:m.content}));
+  document.getElementById("messages").innerHTML = "";
+  document.getElementById("welcome").classList.add("hidden");
+  (data || []).forEach(m => addMessage(m.role,m.content,false));
+  showPage("chat");
 }
 
-function addMessage(text,sender){
-const bubble=document.createElement("div");
-bubble.className="message "+sender;
-const label=document.createElement("span");
-label.className="message-label";
-label.textContent=sender==="user"?"YOU":"CLARIO";
-const content=document.createElement("div");
-content.textContent=text;
-bubble.appendChild(label);
-bubble.appendChild(content);
-messages.appendChild(bubble);
-bubble.scrollIntoView({behavior:"smooth",block:"end"});
-return content;
+async function deleteConversation(id) {
+  if (!confirm("Delete this conversation and its messages?")) return;
+  const {error} = await supabaseClient.from("conversations")
+    .delete().eq("id",id).eq("user_id",currentUser.id);
+  if (error) return alert(error.message);
+  if (currentConversation === id) {
+    currentConversation = null;
+    chatHistory = [];
+    document.getElementById("messages").innerHTML = "";
+  }
+  await loadConversations();
+  if (!currentConversation) await newChat();
 }
 
-/* CONVERSATIONS */
-async function createConversation(title){
-const {data,error}=await supabaseClient
-.from("conversations")
-.insert({user_id:currentUser.id,title})
-.select()
-.single();
-
-if(error)throw error;
-currentConversation=data;
-await loadConversations();
-return data;
+function showPage(page) {
+  document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
+  const target = document.getElementById("page-" + page);
+  if (target) target.classList.add("active");
+  document.querySelectorAll("[data-page]").forEach(el =>
+    el.classList.toggle("active",el.dataset.page===page)
+  );
+  const names = {chat:"AI Assistant",code:"Code Assistant",research:"Research",
+    documents:"Documents",studio:"AI Studio",voice:"Voice Assistant",learn:"Learn"};
+  document.getElementById("pageTitle").textContent = names[page] || "CLARIO AI";
+  document.getElementById("composer").classList.toggle("hidden",page==="studio"||page==="voice");
 }
 
-async function loadConversations(){
-if(!currentUser)return;
-const {data,error}=await supabaseClient
-.from("conversations")
-.select("id,title,created_at,updated_at")
-.order("updated_at",{ascending:false});
-
-if(error){
-console.error("Conversation list:",error);
-return;
+function startWorkspace(prompt) {
+  showPage("chat");
+  document.getElementById("userInput").value = prompt;
+  sendMessage();
 }
 
-const list=document.getElementById("historyList");
-list.innerHTML="";
-
-(data||[]).forEach(conversation=>{
-const row=document.createElement("div");
-row.className="history-item";
-
-const open=document.createElement("button");
-open.className="history-open";
-open.textContent=conversation.title;
-open.onclick=()=>openConversation(conversation.id);
-
-const del=document.createElement("button");
-del.className="delete-chat";
-del.textContent="×";
-del.title="Delete conversation";
-del.onclick=()=>deleteConversation(conversation.id);
-
-row.appendChild(open);
-row.appendChild(del);
-list.appendChild(row);
-});
+function useSuggestion(prompt) {
+  document.getElementById("userInput").value = prompt;
+  sendMessage();
 }
 
-async function saveMessage(role,content){
-if(!currentConversation||!currentUser)return;
-
-const {error}=await supabaseClient
-.from("messages")
-.insert({
-conversation_id:currentConversation.id,
-user_id:currentUser.id,
-role,
-content
-});
-
-if(error)throw error;
-
-await supabaseClient
-.from("conversations")
-.update({updated_at:new Date().toISOString()})
-.eq("id",currentConversation.id);
+function addMessage(role,content,actions=true) {
+  const box = document.createElement("div");
+  box.className = "message " + role;
+  const label = document.createElement("span");
+  label.className = "message-label";
+  label.textContent = role==="user"?"YOU":"CLARIO AI";
+  const body = document.createElement("div");
+  body.textContent = content;
+  box.append(label,body);
+  if (role==="assistant" && actions) {
+    const controls = document.createElement("div");
+    controls.className = "message-actions";
+    const copy = document.createElement("button");
+    copy.textContent = "Copy";
+    copy.onclick = () => navigator.clipboard.writeText(content)
+      .then(()=>copy.textContent="Copied").catch(()=>alert("Copy not available."));
+    const listen = document.createElement("button");
+    listen.textContent = "▶ Listen";
+    listen.onclick = () => speakText(content);
+    controls.append(copy,listen);
+    box.appendChild(controls);
+  }
+  document.getElementById("messages").appendChild(box);
+  box.scrollIntoView({behavior:"smooth",block:"end"});
 }
 
-async function openConversation(id){
-if(isSending)return;
-const {data:conversation,error}=await supabaseClient
-.from("conversations")
-.select("*")
-.eq("id",id)
-.single();
-
-if(error){alert("Could not open this conversation.");return;}
-
-const {data:storedMessages,error:messageError}=await supabaseClient
-.from("messages")
-.select("*")
-.eq("conversation_id",id)
-.order("created_at",{ascending:true});
-
-if(messageError){alert("Could not load messages.");return;}
-
-currentConversation=conversation;
-chatHistory=[];
-messages.innerHTML="";
-welcome.style.display="none";
-showPage("chat");
-
-(storedMessages||[]).forEach(item=>{
-addMessage(item.content,item.role==="user"?"user":"assistant");
-chatHistory.push({role:item.role,content:item.content});
-});
+async function saveMessage(role,content) {
+  if (!currentConversation) return;
+  const {error} = await supabaseClient.from("messages").insert({
+    conversation_id:currentConversation,user_id:currentUser.id,role,content
+  });
+  if (error) console.error("Message save error:",error.message);
 }
 
-async function deleteConversation(id){
-if(!confirm("Delete this conversation and all its messages?"))return;
-
-const {error}=await supabaseClient
-.from("conversations")
-.delete()
-.eq("id",id);
-
-if(error){alert("Could not delete conversation.");return;}
-
-if(currentConversation&&currentConversation.id===id)newChat();
-await loadConversations();
+async function sendMessage() {
+  if (busy) return;
+  const input = document.getElementById("userInput");
+  const message = input.value.trim();
+  if (!message) return;
+  if (!currentConversation) await newChat();
+  busy = true;
+  input.value = "";
+  document.getElementById("sendButton").disabled = true;
+  document.getElementById("welcome").classList.add("hidden");
+  addMessage("user",message);
+  await saveMessage("user",message);
+  chatHistory.push({role:"user",content:message});
+  const loading = document.createElement("div");
+  loading.className = "message assistant";
+  loading.textContent = "CLARIO is thinking...";
+  document.getElementById("messages").appendChild(loading);
+  try {
+    const response = await fetch("/api/chat",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({message,history:chatHistory.slice(-12,-1)})
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "The AI request failed.");
+    const reply = result.reply || "I couldn't produce a response. Please try again.";
+    loading.remove();
+    addMessage("assistant",reply);
+    await saveMessage("assistant",reply);
+    chatHistory.push({role:"assistant",content:reply});
+    if (voiceMode) speakText(reply);
+    await loadConversations();
+  } catch (error) {
+    loading.textContent = "Error: " + error.message;
+    chatHistory.pop();
+  } finally {
+    busy = false;
+    document.getElementById("sendButton").disabled = false;
+    input.focus();
+  }
 }
 
-function newChat(){
-currentConversation=null;
-chatHistory=[];
-messages.innerHTML="";
-welcome.style.display="block";
-showPage("chat");
-promptBox.value="";
-}
-
-/* AI CHAT */
-async function sendMessage(){
-const text=promptBox.value.trim();
-if(!text||isSending||!currentUser)return;
-
-showPage("chat");
-welcome.style.display="none";
-addMessage(text,"user");
-promptBox.value="";
-promptBox.style.height="auto";
-isSending=true;
-sendButton.disabled=true;
-
-const loading=addMessage("CLARIO is thinking...","assistant");
-
-try{
-if(!currentConversation){
-const title=text.length>45?text.slice(0,45)+"...":text;
-await createConversation(title);
-}
-
-await saveMessage("user",text);
-
-const response=await fetch("/api/chat",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({message:text,history:chatHistory})
+document.getElementById("userInput").addEventListener("keydown",e=>{
+  if (e.key==="Enter" && !e.shiftKey) {e.preventDefault();sendMessage();}
 });
 
-const data=await response.json();
-if(!response.ok)throw new Error(data.error||"AI request failed");
-if(!data.reply)throw new Error("No AI response received");
-
-loading.textContent=data.reply;
-await saveMessage("assistant",data.reply);
-
-chatHistory.push(
-{role:"user",content:text},
-{role:"assistant",content:data.reply}
-);
-
-await loadConversations();
-
-}catch(error){
-console.error(error);
-loading.textContent="CLARIO could not complete this request. Please try again. Error: "+error.message;
-}
-
-isSending=false;
-sendButton.disabled=false;
-promptBox.focus();
-}
-
-function useSuggestion(text){
-showPage("chat");
-promptBox.value=text;
-sendMessage();
-}
-
-function askTool(text){
-showPage("chat");
-welcome.style.display="none";
-promptBox.value=text;
-sendMessage();
-}
-
-promptBox.addEventListener("keydown",function(event){
-if(event.key==="Enter"&&!event.shiftKey){
-event.preventDefault();
-sendMessage();
-}
+supabaseClient.auth.getSession().then(({data})=>{
+  if (data.session) {currentUser=data.session.user;enterApp();}
 });
+</script><script>
+function toggleDictation() {
+  const SpeechAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechAPI) {
+    alert("Speech recognition is not supported in this browser. Try Chrome.");
+    return;
+  }
+  if (recognition) {
+    recognition.stop();
+    recognition = null;
+    document.getElementById("chatMic").classList.remove("listening");
+    return;
+  }
+  recognition = new SpeechAPI();
+  recognition.lang = "en-NG";
+  recognition.interimResults = false;
+  recognition.onstart = () => document.getElementById("chatMic").classList.add("listening");
+  recognition.onresult = event => {
+    document.getElementById("userInput").value +=
+      (document.getElementById("userInput").value ? " " : "") +
+      event.results[0][0].transcript;
+  };
+  recognition.onerror = event => console.log("Dictation error:",event.error);
+  recognition.onend = () => {
+    document.getElementById("chatMic").classList.remove("listening");
+    recognition = null;
+  };
+  recognition.start();
+}
 
-promptBox.addEventListener("input",function(){
-this.style.height="auto";
-this.style.height=Math.min(this.scrollHeight,130)+"px";
-});
+function speakText(text) {
+  if (!("speechSynthesis" in window)) {
+    alert("Text-to-speech is not supported in this browser.");
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = "en-US";
+  speech.rate = 1;
+  window.speechSynthesis.speak(speech);
+}
 
-/* STARTUP */
-checkSession();
+function toggleVoice() {
+  const SpeechAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechAPI) {
+    document.getElementById("voiceStatus").textContent =
+      "Speech recognition is not supported. Try opening CLARIO in Chrome.";
+    return;
+  }
+  if (voiceRecognition) {
+    voiceRecognition.stop();
+    return;
+  }
+  voiceMode = true;
+  voiceRecognition = new SpeechAPI();
+  voiceRecognition.lang = "en-NG";
+  voiceRecognition.interimResults = false;
+  voiceRecognition.onstart = () => {
+    document.getElementById("voiceStatus").textContent = "Listening... Speak now.";
+    document.getElementById("voiceButton").textContent = "Stop listening";
+  };
+  voiceRecognition.onresult = event => {
+    const transcript = event.results[0][0].transcript;
+    document.getElementById("voiceStatus").textContent = "You said: " + transcript;
+    showPage("chat");
+    document.getElementById("userInput").value = transcript;
+    sendMessage();
+  };
+  voiceRecognition.onerror = event => {
+    document.getElementById("voiceStatus").textContent =
+      "Microphone error: " + event.error;
+  };
+  voiceRecognition.onend = () => {
+    voiceRecognition = null;
+    document.getElementById("voiceButton").textContent = "🎙 Start listening";
+    if (!busy) voiceMode = false;
+  };
+  voiceRecognition.start();
+}
+
+async function generateImage() {
+  const prompt = document.getElementById("imagePrompt").value.trim();
+  const size = document.getElementById("imageSize").value;
+  const status = document.getElementById("imageStatus");
+  const output = document.getElementById("imageOutput");
+  const button = document.getElementById("generateButton");
+
+  if (!prompt) {
+    status.textContent = "Describe the image you want first.";
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Generating...";
+  status.textContent = "CLARIO is creating your image. This may take a little while.";
+  output.innerHTML = "";
+
+  try {
+    const response = await fetch("/api/image", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({prompt,size})
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "Image generation failed.");
+
+    const imageUrl = result.image || result.url;
+    if (!imageUrl) throw new Error("The image service returned no image.");
+
+    const img = document.createElement("img");
+    img.src = imageUrl;
+    img.alt = prompt;
+    output.appendChild(img);
+
+    const download = document.createElement("a");
+    download.href = imageUrl;
+    download.download = "clario-generated-image.png";
+    download.textContent = "⬇ Download image";
+    download.style.display = "inline-block";
+    download.style.marginTop = "12px";
+    download.style.color = "#80aaff";
+    output.appendChild(download);
+
+    status.textContent = "Your image is ready!";
+  } catch (error) {
+    status.textContent = "Error: " + error.message;
+  } finally {
+    button.disabled = false;
+    button.textContent = "✧ Generate image";
+  }
+}
 </script>
 </body>
 </html>
