@@ -8,506 +8,317 @@
 <title>CLARIO AI | ZELQORA Technologies</title>
 
 <style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background: #090d18;
-  color: #f4f6ff;
-  min-height: 100vh;
-}
-
-.app {
-  display: flex;
-  min-height: 100vh;
-}
-
-.sidebar {
-  width: 245px;
-  background: #101727;
-  padding: 24px 16px;
-  border-right: 1px solid #263149;
-  display: flex;
-  flex-direction: column;
-}
-
-.brand {
-  font-size: 27px;
-  font-weight: bold;
-  letter-spacing: 2px;
-  color: #80aaff;
-  margin-bottom: 5px;
-}
-
-.brand-sub {
-  color: #8591a9;
-  font-size: 11px;
-  margin-bottom: 35px;
-}
-
-.new-chat {
-  background: #315cbd;
-  color: white;
-  border: none;
-  padding: 13px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  margin-bottom: 25px;
-}
-
-.nav-title {
-  font-size: 11px;
-  color: #73809b;
-  margin: 15px 8px;
-  text-transform: uppercase;
-}
-
-.nav-item {
-  padding: 12px;
-  border-radius: 9px;
-  color: #b5bfd3;
-  margin-bottom: 5px;
-  font-size: 14px;
-}
-
-.nav-item.active {
-  background: #1d3158;
-  color: white;
-}
-
-.sidebar-footer {
-  margin-top: auto;
-  color: #8290a9;
-  font-size: 11px;
-  line-height: 1.7;
-}
-
-.main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 100vh;
-}
-
-.topbar {
-  padding: 19px 25px;
-  border-bottom: 1px solid #263149;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.topbar-title {
-  font-size: 15px;
-  font-weight: bold;
-}
-
-.status {
-  color: #65dca3;
-  font-size: 12px;
-}
-
-.content {
-  width: 100%;
-  max-width: 850px;
-  margin: auto;
-  padding: 35px 20px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.welcome {
-  text-align: center;
-  margin: auto 0;
-}
-
-.logo {
-  width: 75px;
-  height: 75px;
-  margin: 0 auto 22px;
-  background: linear-gradient(135deg, #4779ed, #8d55ed);
-  border-radius: 23px;
-  display: grid;
-  place-items: center;
-  font-size: 36px;
-  font-weight: bold;
-  box-shadow: 0 10px 40px #345dc955;
-}
-
-.welcome h1 {
-  font-size: 32px;
-  margin-bottom: 12px;
-}
-
-.welcome p {
-  color: #929db2;
-  line-height: 1.6;
-  font-size: 14px;
-}
-
-.suggestions {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-top: 35px;
-}
-
-.suggestion {
-  background: #141f33;
-  border: 1px solid #293a59;
-  border-radius: 12px;
-  padding: 17px;
-  text-align: left;
-  color: #dce5fa;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-.suggestion:hover {
-  background: #1b2c4b;
-}
-
-.messages {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-  padding-bottom: 25px;
-}
-
-.message {
-  max-width: 85%;
-  padding: 15px 17px;
-  border-radius: 15px;
-  line-height: 1.65;
-  font-size: 14px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-.message.user {
-  align-self: flex-end;
-  background: #294e9c;
-}
-
-.message.assistant {
-  align-self: flex-start;
-  background: #151f31;
-  border: 1px solid #273650;
-}
-
-.message-label {
-  display: block;
-  font-size: 10px;
-  color: #9eafd0;
-  margin-bottom: 7px;
-  font-weight: bold;
-}
-
-.composer {
-  padding: 15px 20px 22px;
-  width: 100%;
-  max-width: 850px;
-  margin: auto;
-}
-
-.input-box {
-  display: flex;
-  align-items: flex-end;
-  gap: 10px;
-  background: #151f31;
-  border: 1px solid #334362;
-  padding: 10px;
-  border-radius: 15px;
-}
-
-textarea {
-  flex: 1;
-  background: transparent;
-  color: white;
-  border: none;
-  outline: none;
-  resize: none;
-  min-height: 40px;
-  max-height: 130px;
-  padding: 11px 5px;
-  font-family: inherit;
-  font-size: 14px;
-}
-
-textarea::placeholder {
-  color: #8290a9;
-}
-
-.send {
-  width: 43px;
-  height: 43px;
-  border: none;
-  border-radius: 11px;
-  background: #4779ed;
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-.send:disabled {
-  opacity: .5;
-  cursor: not-allowed;
-}
-
-.disclaimer {
-  color: #75819a;
-  text-align: center;
-  font-size: 10px;
-  margin-top: 12px;
-}
-
-@media(max-width:700px) {
-  .sidebar {
-    display: none;
-  }
-
-  .topbar {
-    padding: 17px;
-  }
-
-  .content {
-    padding: 25px 15px;
-  }
-
-  .welcome h1 {
-    font-size: 27px;
-  }
-
-  .suggestions {
-    grid-template-columns: 1fr;
-  }
-
-  .message {
-    max-width: 94%;
-  }
-
-  .composer {
-    padding: 12px;
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#090d18;color:#f4f6ff;min-height:100vh}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;background:#101727;padding:23px 15px;border-right:1px solid #263149;display:flex;flex-direction:column}
+.brand{font-size:27px;font-weight:bold;letter-spacing:2px;color:#80aaff}
+.brand-sub{color:#8591a9;font-size:10px;margin:5px 0 30px}
+.new-chat{background:#315cbd;color:white;border:0;padding:13px;border-radius:10px;margin-bottom:22px;cursor:pointer}
+.nav-title{font-size:10px;color:#73809b;margin:14px 9px;text-transform:uppercase}
+.nav-item{width:100%;text-align:left;background:transparent;border:0;padding:12px;border-radius:9px;color:#b5bfd3;margin-bottom:5px;font-size:13px;cursor:pointer}
+.nav-item.active,.nav-item:hover{background:#1d3158;color:white}
+.sidebar-footer{margin-top:auto;color:#8290a9;font-size:10px;line-height:1.8}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;min-height:100vh}
+.topbar{padding:18px 24px;border-bottom:1px solid #263149;display:flex;justify-content:space-between;align-items:center}
+.topbar-title{font-size:15px;font-weight:bold}
+.status{color:#65dca3;font-size:11px}
+.content{width:100%;max-width:900px;margin:auto;padding:28px 20px;flex:1}
+.page{display:none}
+.page.active{display:block}
+.welcome{text-align:center;margin:35px auto}
+.logo{width:72px;height:72px;margin:0 auto 20px;background:linear-gradient(135deg,#4779ed,#8d55ed);border-radius:22px;display:grid;place-items:center;font-size:35px;font-weight:bold}
+h1{font-size:30px;margin-bottom:12px}
+.subtitle{color:#929db2;font-size:14px;line-height:1.7}
+.suggestions{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:30px auto;max-width:650px}
+.suggestion,.tool-card{background:#141f33;border:1px solid #293a59;border-radius:12px;padding:16px;text-align:left;color:#dce5fa;cursor:pointer}
+.suggestion:hover,.tool-card:hover{background:#1b2c4b}
+.messages{display:flex;flex-direction:column;gap:20px;padding:15px 0 25px}
+.message{max-width:88%;padding:15px;border-radius:14px;line-height:1.65;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.message.user{align-self:flex-end;background:#294e9c}
+.message.assistant{align-self:flex-start;background:#151f31;border:1px solid #273650}
+.message-label{display:block;font-size:10px;color:#9eafd0;margin-bottom:7px;font-weight:bold}
+.composer{padding:14px 20px 20px;width:100%;max-width:900px;margin:auto}
+.input-box{display:flex;align-items:flex-end;gap:10px;background:#151f31;border:1px solid #334362;padding:10px;border-radius:15px}
+textarea{flex:1;background:transparent;color:white;border:0;outline:none;resize:none;min-height:40px;max-height:130px;padding:11px 5px;font-family:inherit;font-size:14px}
+textarea::placeholder{color:#8290a9}
+.send{width:43px;height:43px;border:0;border-radius:11px;background:#4779ed;color:white;font-size:20px;cursor:pointer}
+.send:disabled{opacity:.5}
+.disclaimer{text-align:center;color:#75819a;font-size:10px;margin-top:10px}
+.page-heading{font-size:25px;margin:12px 0}
+.page-description{color:#929db2;font-size:13px;line-height:1.6;margin-bottom:24px}
+.tool-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
+.tool-card{min-height:125px}
+.tool-card strong{display:block;margin-bottom:10px;font-size:15px}
+.tool-card span{color:#9eabc1;font-size:12px;line-height:1.5}
+.workspace-panel{background:#141f33;border:1px solid #293a59;border-radius:14px;padding:20px;margin-top:18px}
+.workspace-panel p{font-size:13px;color:#aebbd1;line-height:1.7;margin:10px 0 15px}
+.primary-button{background:#4779ed;color:white;border:0;border-radius:9px;padding:12px 16px;cursor:pointer}
+.secondary-button{background:#263650;color:white;border:0;border-radius:9px;padding:11px 15px;cursor:pointer}
+.bottom-nav{display:none}
+@media(max-width:700px){
+.sidebar{display:none}
+.topbar{padding:16px}
+.content{padding:20px 14px 15px}
+h1{font-size:26px}
+.suggestions,.tool-grid{grid-template-columns:1fr}
+.message{max-width:95%}
+.composer{padding:10px 12px 8px}
+.bottom-nav{display:flex;position:sticky;bottom:0;background:#101727;border-top:1px solid #293650;justify-content:space-around;padding:8px 2px calc(8px + env(safe-area-inset-bottom));z-index:5}
+.bottom-nav button{background:transparent;border:0;color:#94a1b8;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:5px;cursor:pointer}
+.bottom-nav button.active{color:#80aaff}
+.bottom-nav .nav-icon{font-size:18px}
 }
 </style>
 </head>
 
 <body>
-
 <div class="app">
 
-  <aside class="sidebar">
-    <div class="brand">CLARIO</div>
-    <div class="brand-sub">INTELLIGENCE REIMAGINED</div>
+<aside class="sidebar">
+  <div class="brand">CLARIO</div>
+  <div class="brand-sub">INTELLIGENCE REIMAGINED</div>
+  <button class="new-chat" onclick="newChat()">＋ New conversation</button>
+  <div class="nav-title">AI Workspace</div>
+  <button class="nav-item active" data-page="chat" onclick="showPage('chat')">✦ AI Chat</button>
+  <button class="nav-item" data-page="code" onclick="showPage('code')">⌘ Code Assistant</button>
+  <button class="nav-item" data-page="research" onclick="showPage('research')">⌕ Research</button>
+  <button class="nav-item" data-page="documents" onclick="showPage('documents')">▤ Documents</button>
+  <button class="nav-item" data-page="studio" onclick="showPage('studio')">✧ AI Studio</button>
+  <button class="nav-item" data-page="voice" onclick="showPage('voice')">◉ Voice Assistant</button>
+  <button class="nav-item" data-page="learn" onclick="showPage('learn')">◎ CLARIO Learn</button>
+  <div class="sidebar-footer">
+    Developed by<br><strong>ZELQORA TECHNOLOGIES</strong><br>
+    Building Tomorrow's Digital Future.
+  </div>
+</aside>
 
-    <button class="new-chat" onclick="newChat()">
-      + New conversation
-    </button>
+<main class="main">
+<header class="topbar">
+  <div class="topbar-title" id="topTitle">CLARIO AI</div>
+  <div class="status">● Workspace</div>
+</header>
 
-    <div class="nav-title">Workspace</div>
-    <div class="nav-item active">✦ AI Chat</div>
-    <div class="nav-item">⌘ Code Assistant</div>
-    <div class="nav-item">⌕ Research</div>
-    <div class="nav-item">▤ Documents</div>
-    <div class="nav-item">✧ AI Studio</div>
-    <div class="nav-item">◉ Voice Assistant</div>
+<div class="content">
 
-    <div class="sidebar-footer">
-      Developed by<br>
-      <strong>ZELQORA TECHNOLOGIES</strong><br>
-      Building Tomorrow's Digital Future.
+<section class="page active" id="page-chat">
+  <div class="welcome" id="welcome">
+    <div class="logo">C</div>
+    <h1>Meet CLARIO.</h1>
+    <p class="subtitle">Your intelligent AI companion.<br>Ask questions, explore ideas, learn and create.</p>
+    <div class="suggestions">
+      <button class="suggestion" onclick="useSuggestion('Teach me something interesting today.')">✦ Teach me something interesting</button>
+      <button class="suggestion" onclick="useSuggestion('Help me write a professional business plan.')">◈ Write a business plan</button>
+      <button class="suggestion" onclick="useSuggestion('Help me understand JavaScript programming.')">⌘ Teach me programming</button>
+      <button class="suggestion" onclick="useSuggestion('Explain a difficult topic in simple terms.')">◎ Explain something difficult</button>
     </div>
-  </aside>
+  </div>
+  <div class="messages" id="messages"></div>
+</section>
 
-  <main class="main">
+<section class="page" id="page-code">
+  <h1 class="page-heading">⌘ Code Assistant</h1>
+  <p class="page-description">Build software, understand code, debug errors and learn programming with CLARIO.</p>
+  <div class="tool-grid">
+    <button class="tool-card" onclick="askTool('Help me write a new program. Ask me what I want to build.')"><strong>＋ Create code</strong><span>Start a new programming project.</span></button>
+    <button class="tool-card" onclick="askTool('Help me debug my code. Ask me to provide the code and error.')"><strong>⚙ Debug code</strong><span>Find and explain programming errors.</span></button>
+    <button class="tool-card" onclick="askTool('Teach me programming step by step, starting with the basics.')"><strong>◎ Learn coding</strong><span>Learn programming from the beginning.</span></button>
+    <button class="tool-card" onclick="askTool('Explain how APIs work and show me an example.')"><strong>⌘ Understand APIs</strong><span>Learn how software systems connect.</span></button>
+  </div>
+</section>
 
-    <header class="topbar">
-      <div class="topbar-title">CLARIO AI</div>
-      <div class="status">● AI Workspace</div>
-    </header>
+<section class="page" id="page-research">
+  <h1 class="page-heading">⌕ CLARIO Research</h1>
+  <p class="page-description">Explore questions, understand subjects and organise information.</p>
+  <div class="workspace-panel">
+    <strong>Start your research</strong>
+    <p>Ask CLARIO to explain a subject, compare ideas or prepare a structured research outline.</p>
+    <button class="primary-button" onclick="askTool('Help me research a topic. Ask me which topic I want to investigate.')">Start research</button>
+  </div>
+</section>
 
-    <section class="content">
+<section class="page" id="page-documents">
+  <h1 class="page-heading">▤ Documents</h1>
+  <p class="page-description">Get help drafting, improving and understanding written documents.</p>
+  <div class="workspace-panel">
+    <strong>Document workspace</strong>
+    <p>Document upload and automatic file analysis are planned for a later update. For now, you can paste text into the chat for help.</p>
+    <button class="primary-button" onclick="askTool('Help me write or improve a document. Ask what type of document I need.')">Write a document</button>
+  </div>
+</section>
 
-      <div class="welcome" id="welcome">
-        <div class="logo">C</div>
+<section class="page" id="page-studio">
+  <h1 class="page-heading">✧ AI Studio</h1>
+  <p class="page-description">Your creative workspace for AI-powered visual ideas.</p>
+  <div class="workspace-panel">
+    <strong>Creative assistant</strong>
+    <p>Image generation and image editing are planned features. You can start by asking CLARIO to develop an image concept or prompt.</p>
+    <button class="primary-button" onclick="askTool('Help me develop a detailed creative image prompt. Ask what image I want to create.')">Create an image concept</button>
+  </div>
+</section>
 
-        <h1>Meet CLARIO.</h1>
+<section class="page" id="page-voice">
+  <h1 class="page-heading">◉ Voice Assistant</h1>
+  <p class="page-description">A future voice conversation workspace.</p>
+  <div class="workspace-panel">
+    <strong>Voice features coming later</strong>
+    <p>Live voice conversations are not connected yet. You can use the text assistant in the meantime.</p>
+    <button class="primary-button" onclick="showPage('chat')">Open AI Chat</button>
+  </div>
+</section>
 
-        <p>
-          Your intelligent AI companion.<br>
-          Ask questions, explore ideas, learn and create.
-        </p>
+<section class="page" id="page-learn">
+  <h1 class="page-heading">◎ CLARIO Learn</h1>
+  <p class="page-description">Learn new subjects with explanations, examples and practice questions.</p>
+  <div class="tool-grid">
+    <button class="tool-card" onclick="askTool('Teach me a subject step by step. Ask which subject I am studying.')"><strong>▤ Lessons</strong><span>Understand topics in simple steps.</span></button>
+    <button class="tool-card" onclick="askTool('Give me a practice quiz. First ask me which subject and difficulty.')"><strong>✎ Practice quiz</strong><span>Test your understanding.</span></button>
+    <button class="tool-card" onclick="askTool('Help me create a study plan for my subject.')"><strong>◷ Study planner</strong><span>Organise your learning.</span></button>
+    <button class="tool-card" onclick="askTool('Help me memorise important facts using flashcards.')"><strong>▣ Flashcards</strong><span>Practise remembering key facts.</span></button>
+  </div>
+</section>
 
-        <div class="suggestions">
-          <button class="suggestion"
-            onclick="useSuggestion('Teach me something interesting today.')">
-            ✦ Teach me something interesting
-          </button>
+</div>
 
-          <button class="suggestion"
-            onclick="useSuggestion('Help me write a professional business plan.')">
-            ◈ Write a business plan
-          </button>
+<div class="composer" id="composer">
+  <div class="input-box">
+    <textarea id="promptBox" placeholder="Message CLARIO..." rows="1"></textarea>
+    <button class="send" id="sendButton" onclick="sendMessage()">↑</button>
+  </div>
+  <div class="disclaimer">CLARIO can make mistakes. Verify important information.</div>
+</div>
 
-          <button class="suggestion"
-            onclick="useSuggestion('Help me understand JavaScript programming.')">
-            ⌘ Teach me programming
-          </button>
+<nav class="bottom-nav">
+  <button class="active" data-page="chat" onclick="showPage('chat')"><span class="nav-icon">✦</span>Chat</button>
+  <button data-page="code" onclick="showPage('code')"><span class="nav-icon">⌘</span>Code</button>
+  <button data-page="research" onclick="showPage('research')"><span class="nav-icon">⌕</span>Research</button>
+  <button data-page="studio" onclick="showPage('studio')"><span class="nav-icon">✧</span>Studio</button>
+  <button data-page="learn" onclick="showPage('learn')"><span class="nav-icon">◎</span>Learn</button>
+</nav>
 
-          <button class="suggestion"
-            onclick="useSuggestion('Explain a difficult topic in simple terms.')">
-            ◉ Explain something difficult
-          </button>
-        </div>
-      </div>
-
-      <div class="messages" id="messages"></div>
-
-    </section>
-
-    <div class="composer">
-      <div class="input-box">
-        <textarea
-          id="promptBox"
-          placeholder="Message CLARIO..."
-          rows="1"
-        ></textarea>
-
-        <button class="send" id="sendButton"
-          onclick="sendMessage()">↑</button>
-      </div>
-
-      <div class="disclaimer">
-        CLARIO can make mistakes. Verify important information.
-      </div>
-    </div>
-
-  </main>
+</main>
 </div>
 
 <script>
-const promptBox = document.getElementById("promptBox");
-const messages = document.getElementById("messages");
-const welcome = document.getElementById("welcome");
-const sendButton = document.getElementById("sendButton");
+const promptBox=document.getElementById("promptBox");
+const messages=document.getElementById("messages");
+const welcome=document.getElementById("welcome");
+const sendButton=document.getElementById("sendButton");
+const composer=document.getElementById("composer");
+const topTitle=document.getElementById("topTitle");
 
-let chatHistory = [];
-let isSending = false;
+let chatHistory=[];
+let isSending=false;
+let currentPage="chat";
 
-function addMessage(text, sender) {
-  const bubble = document.createElement("div");
-  bubble.className = "message " + sender;
+const pageNames={
+chat:"CLARIO AI",
+code:"Code Assistant",
+research:"CLARIO Research",
+documents:"Documents",
+studio:"AI Studio",
+voice:"Voice Assistant",
+learn:"CLARIO Learn"
+};
 
-  const label = document.createElement("span");
-  label.className = "message-label";
-  label.textContent = sender === "user" ? "YOU" : "CLARIO";
-
-  const content = document.createElement("div");
-  content.textContent = text;
-
-  bubble.appendChild(label);
-  bubble.appendChild(content);
-
-  messages.appendChild(bubble);
-
-  bubble.scrollIntoView({
-    behavior: "smooth",
-    block: "end"
-  });
-
-  return content;
+function showPage(name){
+currentPage=name;
+document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+document.getElementById("page-"+name).classList.add("active");
+document.querySelectorAll("[data-page]").forEach(b=>{
+b.classList.toggle("active",b.dataset.page===name);
+});
+topTitle.textContent=pageNames[name];
+composer.style.display="block";
+if(name==="voice"||name==="documents"||name==="studio"){
+composer.style.display="none";
+}
 }
 
-async function sendMessage() {
-  const text = promptBox.value.trim();
-
-  if (!text || isSending) return;
-
-  welcome.style.display = "none";
-
-  addMessage(text, "user");
-
-  promptBox.value = "";
-  promptBox.style.height = "auto";
-
-  isSending = true;
-  sendButton.disabled = true;
-
-  const loading = addMessage("CLARIO is thinking...", "assistant");
-
-  try {
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: text,
-        history: chatHistory
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "AI request failed");
-    }
-
-    if (!data.reply) {
-      throw new Error("No AI response received");
-    }
-
-    loading.textContent = data.reply;
-
-    chatHistory.push(
-      { role: "user", content: text },
-      { role: "assistant", content: data.reply }
-    );
-
-  } catch (error) {
-    console.error(error);
-
-    loading.textContent =
-      "Sorry, CLARIO couldn't connect to its AI service. Please try again.";
-  }
-
-  isSending = false;
-  sendButton.disabled = false;
-  promptBox.focus();
+function addMessage(text,sender){
+const bubble=document.createElement("div");
+bubble.className="message "+sender;
+const label=document.createElement("span");
+label.className="message-label";
+label.textContent=sender==="user"?"YOU":"CLARIO";
+const content=document.createElement("div");
+content.textContent=text;
+bubble.appendChild(label);
+bubble.appendChild(content);
+messages.appendChild(bubble);
+bubble.scrollIntoView({behavior:"smooth",block:"end"});
+return content;
 }
 
-function useSuggestion(text) {
-  promptBox.value = text;
-  sendMessage();
+async function sendMessage(){
+const text=promptBox.value.trim();
+if(!text||isSending)return;
+
+showPage("chat");
+welcome.style.display="none";
+addMessage(text,"user");
+promptBox.value="";
+promptBox.style.height="auto";
+isSending=true;
+sendButton.disabled=true;
+const loading=addMessage("CLARIO is thinking...","assistant");
+
+try{
+const response=await fetch("/api/chat",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({message:text,history:chatHistory})
+});
+const data=await response.json();
+if(!response.ok)throw new Error(data.error||"AI request failed");
+if(!data.reply)throw new Error("No AI response received");
+loading.textContent=data.reply;
+chatHistory.push(
+{role:"user",content:text},
+{role:"assistant",content:data.reply}
+);
+}catch(error){
+console.error(error);
+loading.textContent="CLARIO could not connect to its AI service. Please try again.";
+}
+isSending=false;
+sendButton.disabled=false;
+promptBox.focus();
 }
 
-function newChat() {
-  messages.innerHTML = "";
-  chatHistory = [];
-  welcome.style.display = "block";
-  promptBox.value = "";
+function useSuggestion(text){
+showPage("chat");
+promptBox.value=text;
+sendMessage();
 }
 
-promptBox.addEventListener("keydown", function(event) {
-  if (event.key === "Enter" && !event.shiftKey) {
-    event.preventDefault();
-    sendMessage();
-  }
+function askTool(text){
+showPage("chat");
+welcome.style.display="none";
+promptBox.value=text;
+sendMessage();
+}
+
+function newChat(){
+messages.innerHTML="";
+chatHistory=[];
+welcome.style.display="block";
+showPage("chat");
+promptBox.value="";
+}
+
+promptBox.addEventListener("keydown",function(event){
+if(event.key==="Enter"&&!event.shiftKey){
+event.preventDefault();
+sendMessage();
+}
 });
 
-promptBox.addEventListener("input", function() {
-  this.style.height = "auto";
-  this.style.height = Math.min(this.scrollHeight, 130) + "px";
+promptBox.addEventListener("input",function(){
+this.style.height="auto";
+this.style.height=Math.min(this.scrollHeight,130)+"px";
 });
 </script>
-
 </body>
 </html>
+
