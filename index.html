@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,18 +8,30 @@
 <meta name="theme-color" content="#090d18">
 <title>CLARIO AI | ZELQORA Technologies</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Arial,sans-serif;background:#090d18;color:#f4f6ff;min-height:100vh}
+button,input,textarea{font-family:inherit}
+button{cursor:pointer}
 .app{display:flex;min-height:100vh}
-.sidebar{width:245px;background:#101727;padding:23px 15px;border-right:1px solid #263149;display:flex;flex-direction:column}
+.sidebar{width:255px;background:#101727;padding:20px 14px;border-right:1px solid #263149;display:flex;flex-direction:column;flex-shrink:0}
 .brand{font-size:27px;font-weight:bold;letter-spacing:2px;color:#80aaff}
-.brand-sub{color:#8591a9;font-size:10px;margin:5px 0 30px}
-.new-chat{background:#315cbd;color:white;border:0;padding:13px;border-radius:10px;margin-bottom:22px;cursor:pointer}
+.brand-sub{color:#8591a9;font-size:10px;margin:5px 0 25px}
+.new-chat{background:#315cbd;color:white;border:0;padding:13px;border-radius:10px;margin-bottom:18px}
 .nav-title{font-size:10px;color:#73809b;margin:14px 9px;text-transform:uppercase}
-.nav-item{width:100%;text-align:left;background:transparent;border:0;padding:12px;border-radius:9px;color:#b5bfd3;margin-bottom:5px;font-size:13px;cursor:pointer}
+.nav-item{width:100%;text-align:left;background:transparent;border:0;padding:12px;border-radius:9px;color:#b5bfd3;margin-bottom:5px;font-size:13px}
 .nav-item.active,.nav-item:hover{background:#1d3158;color:white}
-.sidebar-footer{margin-top:auto;color:#8290a9;font-size:10px;line-height:1.8}
+.history-list{max-height:260px;overflow-y:auto}
+.history-item{display:flex;align-items:center;gap:5px;margin:4px 0}
+.history-open{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;background:transparent;border:0;color:#aebbd1;padding:9px;font-size:12px;border-radius:7px}
+.history-open:hover{background:#1d2940;color:white}
+.delete-chat{background:transparent;border:0;color:#8591a9;padding:7px}
+.sidebar-footer{margin-top:auto;color:#8290a9;font-size:10px;line-height:1.8;padding-top:15px}
+.account-area{border-top:1px solid #293650;margin-top:15px;padding-top:13px}
+.account-email{font-size:11px;color:#aebbd1;overflow-wrap:anywhere;margin-bottom:9px}
+.small-button{background:#263650;color:white;border:0;padding:9px 12px;border-radius:8px;font-size:11px}
 .main{flex:1;min-width:0;display:flex;flex-direction:column;min-height:100vh}
 .topbar{padding:18px 24px;border-bottom:1px solid #263149;display:flex;justify-content:space-between;align-items:center}
 .topbar-title{font-size:15px;font-weight:bold}
@@ -31,7 +44,7 @@ body{font-family:Arial,sans-serif;background:#090d18;color:#f4f6ff;min-height:10
 h1{font-size:30px;margin-bottom:12px}
 .subtitle{color:#929db2;font-size:14px;line-height:1.7}
 .suggestions{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:30px auto;max-width:650px}
-.suggestion,.tool-card{background:#141f33;border:1px solid #293a59;border-radius:12px;padding:16px;text-align:left;color:#dce5fa;cursor:pointer}
+.suggestion,.tool-card{background:#141f33;border:1px solid #293a59;border-radius:12px;padding:16px;text-align:left;color:#dce5fa}
 .suggestion:hover,.tool-card:hover{background:#1b2c4b}
 .messages{display:flex;flex-direction:column;gap:20px;padding:15px 0 25px}
 .message{max-width:88%;padding:15px;border-radius:14px;line-height:1.65;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}
@@ -40,9 +53,9 @@ h1{font-size:30px;margin-bottom:12px}
 .message-label{display:block;font-size:10px;color:#9eafd0;margin-bottom:7px;font-weight:bold}
 .composer{padding:14px 20px 20px;width:100%;max-width:900px;margin:auto}
 .input-box{display:flex;align-items:flex-end;gap:10px;background:#151f31;border:1px solid #334362;padding:10px;border-radius:15px}
-textarea{flex:1;background:transparent;color:white;border:0;outline:none;resize:none;min-height:40px;max-height:130px;padding:11px 5px;font-family:inherit;font-size:14px}
+textarea{flex:1;background:transparent;color:white;border:0;outline:none;resize:none;min-height:40px;max-height:130px;padding:11px 5px;font-size:14px}
 textarea::placeholder{color:#8290a9}
-.send{width:43px;height:43px;border:0;border-radius:11px;background:#4779ed;color:white;font-size:20px;cursor:pointer}
+.send{width:43px;height:43px;border:0;border-radius:11px;background:#4779ed;color:white;font-size:20px}
 .send:disabled{opacity:.5}
 .disclaimer{text-align:center;color:#75819a;font-size:10px;margin-top:10px}
 .page-heading{font-size:25px;margin:12px 0}
@@ -53,9 +66,23 @@ textarea::placeholder{color:#8290a9}
 .tool-card span{color:#9eabc1;font-size:12px;line-height:1.5}
 .workspace-panel{background:#141f33;border:1px solid #293a59;border-radius:14px;padding:20px;margin-top:18px}
 .workspace-panel p{font-size:13px;color:#aebbd1;line-height:1.7;margin:10px 0 15px}
-.primary-button{background:#4779ed;color:white;border:0;border-radius:9px;padding:12px 16px;cursor:pointer}
-.secondary-button{background:#263650;color:white;border:0;border-radius:9px;padding:11px 15px;cursor:pointer}
+.primary-button{background:#4779ed;color:white;border:0;border-radius:9px;padding:12px 16px}
 .bottom-nav{display:none}
+.auth-screen{position:fixed;inset:0;background:#090d18;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.auth-card{width:100%;max-width:420px;background:#121d30;border:1px solid #293a59;border-radius:18px;padding:28px}
+.auth-logo{font-size:30px;font-weight:bold;letter-spacing:3px;color:#80aaff;text-align:center;margin-bottom:5px}
+.auth-sub{text-align:center;color:#8290a9;font-size:12px;margin-bottom:25px}
+.auth-card h2{font-size:22px;margin-bottom:8px}
+.auth-description{color:#929db2;font-size:13px;line-height:1.5;margin-bottom:20px}
+.auth-card label{display:block;font-size:12px;color:#b5bfd3;margin:14px 0 7px}
+.auth-card input{width:100%;background:#090f1d;border:1px solid #334362;color:white;padding:13px;border-radius:9px;outline:none}
+.auth-card input:focus{border-color:#6492ff}
+.auth-submit{width:100%;background:#4779ed;color:white;border:0;padding:14px;border-radius:9px;margin-top:20px;font-weight:bold}
+.auth-switch{text-align:center;color:#929db2;font-size:12px;margin-top:18px}
+.auth-switch button{background:none;border:0;color:#80aaff}
+.auth-message{font-size:12px;line-height:1.5;margin-top:13px;color:#ffb9b9;overflow-wrap:anywhere}
+.auth-message.success{color:#65dca3}
+.hidden{display:none!important}
 @media(max-width:700px){
 .sidebar{display:none}
 .topbar{padding:16px}
@@ -65,7 +92,7 @@ h1{font-size:26px}
 .message{max-width:95%}
 .composer{padding:10px 12px 8px}
 .bottom-nav{display:flex;position:sticky;bottom:0;background:#101727;border-top:1px solid #293650;justify-content:space-around;padding:8px 2px calc(8px + env(safe-area-inset-bottom));z-index:5}
-.bottom-nav button{background:transparent;border:0;color:#94a1b8;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:5px;cursor:pointer}
+.bottom-nav button{background:transparent;border:0;color:#94a1b8;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:5px}
 .bottom-nav button.active{color:#80aaff}
 .bottom-nav .nav-icon{font-size:18px}
 }
@@ -73,12 +100,79 @@ h1{font-size:26px}
 </head>
 
 <body>
-<div class="app">
+
+<!-- LOGIN AND REGISTRATION -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-card">
+    <div class="auth-logo">CLARIO</div>
+    <div class="auth-sub">INTELLIGENCE REIMAGINED</div>
+
+    <div id="loginForm">
+      <h2>Welcome back</h2>
+      <p class="auth-description">Sign in to continue your conversations with CLARIO.</p>
+
+      <label>Email address</label>
+      <input id="loginEmail" type="email" placeholder="you@example.com" autocomplete="email">
+
+      <label>Password</label>
+      <input id="loginPassword" type="password" placeholder="Your password" autocomplete="current-password">
+
+      <button class="auth-submit" id="loginButton" onclick="login()">Sign in</button>
+
+      <div class="auth-switch">
+        New to CLARIO? <button onclick="showAuthForm('signup')">Create an account</button>
+      </div>
+      <div class="auth-switch">
+        <button onclick="showAuthForm('reset')">Forgot your password?</button>
+      </div>
+    </div>
+
+    <div id="signupForm" class="hidden">
+      <h2>Create your account</h2>
+      <p class="auth-description">Join CLARIO and save your AI conversations.</p>
+
+      <label>Your name</label>
+      <input id="signupName" type="text" placeholder="Your name" autocomplete="name">
+
+      <label>Email address</label>
+      <input id="signupEmail" type="email" placeholder="you@example.com" autocomplete="email">
+
+      <label>Password</label>
+      <input id="signupPassword" type="password" placeholder="At least 8 characters" autocomplete="new-password">
+
+      <button class="auth-submit" id="signupButton" onclick="signup()">Create account</button>
+
+      <div class="auth-switch">
+        Already registered? <button onclick="showAuthForm('login')">Sign in</button>
+      </div>
+    </div>
+
+    <div id="resetForm" class="hidden">
+      <h2>Reset password</h2>
+      <p class="auth-description">Enter your email and we'll send a password reset link.</p>
+
+      <label>Email address</label>
+      <input id="resetEmail" type="email" placeholder="you@example.com">
+
+      <button class="auth-submit" onclick="resetPassword()">Send reset link</button>
+
+      <div class="auth-switch">
+        <button onclick="showAuthForm('login')">Back to sign in</button>
+      </div>
+    </div>
+
+    <div class="auth-message" id="authMessage"></div>
+  </div>
+</div>
+
+<div class="app" id="app" style="display:none">
 
 <aside class="sidebar">
   <div class="brand">CLARIO</div>
   <div class="brand-sub">INTELLIGENCE REIMAGINED</div>
+
   <button class="new-chat" onclick="newChat()">＋ New conversation</button>
+
   <div class="nav-title">AI Workspace</div>
   <button class="nav-item active" data-page="chat" onclick="showPage('chat')">✦ AI Chat</button>
   <button class="nav-item" data-page="code" onclick="showPage('code')">⌘ Code Assistant</button>
@@ -87,6 +181,15 @@ h1{font-size:26px}
   <button class="nav-item" data-page="studio" onclick="showPage('studio')">✧ AI Studio</button>
   <button class="nav-item" data-page="voice" onclick="showPage('voice')">◉ Voice Assistant</button>
   <button class="nav-item" data-page="learn" onclick="showPage('learn')">◎ CLARIO Learn</button>
+
+  <div class="nav-title">Your conversations</div>
+  <div class="history-list" id="historyList"></div>
+
+  <div class="account-area">
+    <div class="account-email" id="accountEmail"></div>
+    <button class="small-button" onclick="logout()">Sign out</button>
+  </div>
+
   <div class="sidebar-footer">
     Developed by<br><strong>ZELQORA TECHNOLOGIES</strong><br>
     Building Tomorrow's Digital Future.
@@ -96,7 +199,7 @@ h1{font-size:26px}
 <main class="main">
 <header class="topbar">
   <div class="topbar-title" id="topTitle">CLARIO AI</div>
-  <div class="status">● Workspace</div>
+  <div class="status">● Online</div>
 </header>
 
 <div class="content">
@@ -142,7 +245,7 @@ h1{font-size:26px}
   <p class="page-description">Get help drafting, improving and understanding written documents.</p>
   <div class="workspace-panel">
     <strong>Document workspace</strong>
-    <p>Document upload and automatic file analysis are planned for a later update. For now, you can paste text into the chat for help.</p>
+    <p>Document upload and automatic file analysis are planned for a later update. For now, paste text into the chat.</p>
     <button class="primary-button" onclick="askTool('Help me write or improve a document. Ask what type of document I need.')">Write a document</button>
   </div>
 </section>
@@ -152,7 +255,7 @@ h1{font-size:26px}
   <p class="page-description">Your creative workspace for AI-powered visual ideas.</p>
   <div class="workspace-panel">
     <strong>Creative assistant</strong>
-    <p>Image generation and image editing are planned features. You can start by asking CLARIO to develop an image concept or prompt.</p>
+    <p>Image generation and image editing are planned features. Start by developing an image concept or prompt.</p>
     <button class="primary-button" onclick="askTool('Help me develop a detailed creative image prompt. Ask what image I want to create.')">Create an image concept</button>
   </div>
 </section>
@@ -162,7 +265,7 @@ h1{font-size:26px}
   <p class="page-description">A future voice conversation workspace.</p>
   <div class="workspace-panel">
     <strong>Voice features coming later</strong>
-    <p>Live voice conversations are not connected yet. You can use the text assistant in the meantime.</p>
+    <p>Live voice conversations are not connected yet.</p>
     <button class="primary-button" onclick="showPage('chat')">Open AI Chat</button>
   </div>
 </section>
@@ -200,6 +303,12 @@ h1{font-size:26px}
 </div>
 
 <script>
+/* SUPABASE CONNECTION */
+const SUPABASE_URL = "https://rxbgskxrcgwbovcxovqs.supabase.co";
+const SUPABASE_KEY = "sb_publishable_UZHseC22kb5wUzakKmJofA_MjIPBS0F";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+/* APP STATE */
 const promptBox=document.getElementById("promptBox");
 const messages=document.getElementById("messages");
 const welcome=document.getElementById("welcome");
@@ -207,20 +316,140 @@ const sendButton=document.getElementById("sendButton");
 const composer=document.getElementById("composer");
 const topTitle=document.getElementById("topTitle");
 
+let currentUser=null;
+let currentConversation=null;
 let chatHistory=[];
 let isSending=false;
 let currentPage="chat";
 
 const pageNames={
-chat:"CLARIO AI",
-code:"Code Assistant",
-research:"CLARIO Research",
-documents:"Documents",
-studio:"AI Studio",
-voice:"Voice Assistant",
-learn:"CLARIO Learn"
+chat:"CLARIO AI",code:"Code Assistant",research:"CLARIO Research",
+documents:"Documents",studio:"AI Studio",voice:"Voice Assistant",learn:"CLARIO Learn"
 };
 
+function authMessage(text,success=false){
+const el=document.getElementById("authMessage");
+el.textContent=text;
+el.className="auth-message"+(success?" success":"");
+}
+
+function showAuthForm(name){
+["loginForm","signupForm","resetForm"].forEach(id=>{
+document.getElementById(id).classList.add("hidden");
+});
+document.getElementById(name+"Form").classList.remove("hidden");
+authMessage("");
+}
+
+function setBusy(id,busy){
+const button=document.getElementById(id);
+button.disabled=busy;
+button.textContent=busy?"Please wait...":(
+id==="loginButton"?"Sign in":"Create account"
+);
+}
+
+async function signup(){
+const name=document.getElementById("signupName").value.trim();
+const email=document.getElementById("signupEmail").value.trim();
+const password=document.getElementById("signupPassword").value;
+
+if(!name||!email||password.length<8){
+authMessage("Enter your name, a valid email and a password of at least 8 characters.");
+return;
+}
+
+setBusy("signupButton",true);
+try{
+const {data,error}=await supabaseClient.auth.signUp({
+email,password,
+options:{data:{full_name:name}}
+});
+if(error)throw error;
+
+if(data.session){
+await enterApp(data.session.user);
+}else{
+authMessage("Account created! Check your email for a confirmation link, then return here to sign in.",true);
+}
+}catch(error){
+authMessage(error.message||"Registration failed.");
+}finally{
+setBusy("signupButton",false);
+}
+}
+
+async function login(){
+const email=document.getElementById("loginEmail").value.trim();
+const password=document.getElementById("loginPassword").value;
+
+if(!email||!password){
+authMessage("Enter your email and password.");
+return;
+}
+
+setBusy("loginButton",true);
+try{
+const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+if(error)throw error;
+await enterApp(data.user);
+}catch(error){
+authMessage(error.message||"Login failed.");
+}finally{
+setBusy("loginButton",false);
+}
+}
+
+async function resetPassword(){
+const email=document.getElementById("resetEmail").value.trim();
+if(!email){authMessage("Enter your email address.");return;}
+try{
+const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{
+redirectTo:window.location.origin
+});
+if(error)throw error;
+authMessage("Password reset email sent. Check your inbox.",true);
+}catch(error){
+authMessage(error.message||"Could not send reset email.");
+}
+}
+
+async function logout(){
+await supabaseClient.auth.signOut();
+currentUser=null;
+currentConversation=null;
+chatHistory=[];
+document.getElementById("app").style.display="none";
+document.getElementById("authScreen").style.display="flex";
+showAuthForm("login");
+}
+
+async function enterApp(user){
+currentUser=user;
+document.getElementById("authScreen").style.display="none";
+document.getElementById("app").style.display="flex";
+document.getElementById("accountEmail").textContent=user.email||"Signed in";
+await loadConversations();
+newChat();
+}
+
+async function checkSession(){
+const {data,error}=await supabaseClient.auth.getSession();
+if(error){authMessage("Could not check your session. Please sign in.");return;}
+if(data.session){
+await enterApp(data.session.user);
+}
+}
+
+supabaseClient.auth.onAuthStateChange((event,session)=>{
+if(event==="SIGNED_OUT"){
+currentUser=null;
+document.getElementById("app").style.display="none";
+document.getElementById("authScreen").style.display="flex";
+}
+});
+
+/* NAVIGATION */
 function showPage(name){
 currentPage=name;
 document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
@@ -229,10 +458,7 @@ document.querySelectorAll("[data-page]").forEach(b=>{
 b.classList.toggle("active",b.dataset.page===name);
 });
 topTitle.textContent=pageNames[name];
-composer.style.display="block";
-if(name==="voice"||name==="documents"||name==="studio"){
-composer.style.display="none";
-}
+composer.style.display=["voice","documents","studio"].includes(name)?"none":"block";
 }
 
 function addMessage(text,sender){
@@ -250,9 +476,133 @@ bubble.scrollIntoView({behavior:"smooth",block:"end"});
 return content;
 }
 
+/* CONVERSATIONS */
+async function createConversation(title){
+const {data,error}=await supabaseClient
+.from("conversations")
+.insert({user_id:currentUser.id,title})
+.select()
+.single();
+
+if(error)throw error;
+currentConversation=data;
+await loadConversations();
+return data;
+}
+
+async function loadConversations(){
+if(!currentUser)return;
+const {data,error}=await supabaseClient
+.from("conversations")
+.select("id,title,created_at,updated_at")
+.order("updated_at",{ascending:false});
+
+if(error){
+console.error("Conversation list:",error);
+return;
+}
+
+const list=document.getElementById("historyList");
+list.innerHTML="";
+
+(data||[]).forEach(conversation=>{
+const row=document.createElement("div");
+row.className="history-item";
+
+const open=document.createElement("button");
+open.className="history-open";
+open.textContent=conversation.title;
+open.onclick=()=>openConversation(conversation.id);
+
+const del=document.createElement("button");
+del.className="delete-chat";
+del.textContent="×";
+del.title="Delete conversation";
+del.onclick=()=>deleteConversation(conversation.id);
+
+row.appendChild(open);
+row.appendChild(del);
+list.appendChild(row);
+});
+}
+
+async function saveMessage(role,content){
+if(!currentConversation||!currentUser)return;
+
+const {error}=await supabaseClient
+.from("messages")
+.insert({
+conversation_id:currentConversation.id,
+user_id:currentUser.id,
+role,
+content
+});
+
+if(error)throw error;
+
+await supabaseClient
+.from("conversations")
+.update({updated_at:new Date().toISOString()})
+.eq("id",currentConversation.id);
+}
+
+async function openConversation(id){
+if(isSending)return;
+const {data:conversation,error}=await supabaseClient
+.from("conversations")
+.select("*")
+.eq("id",id)
+.single();
+
+if(error){alert("Could not open this conversation.");return;}
+
+const {data:storedMessages,error:messageError}=await supabaseClient
+.from("messages")
+.select("*")
+.eq("conversation_id",id)
+.order("created_at",{ascending:true});
+
+if(messageError){alert("Could not load messages.");return;}
+
+currentConversation=conversation;
+chatHistory=[];
+messages.innerHTML="";
+welcome.style.display="none";
+showPage("chat");
+
+(storedMessages||[]).forEach(item=>{
+addMessage(item.content,item.role==="user"?"user":"assistant");
+chatHistory.push({role:item.role,content:item.content});
+});
+}
+
+async function deleteConversation(id){
+if(!confirm("Delete this conversation and all its messages?"))return;
+
+const {error}=await supabaseClient
+.from("conversations")
+.delete()
+.eq("id",id);
+
+if(error){alert("Could not delete conversation.");return;}
+
+if(currentConversation&&currentConversation.id===id)newChat();
+await loadConversations();
+}
+
+function newChat(){
+currentConversation=null;
+chatHistory=[];
+messages.innerHTML="";
+welcome.style.display="block";
+showPage("chat");
+promptBox.value="";
+}
+
+/* AI CHAT */
 async function sendMessage(){
 const text=promptBox.value.trim();
-if(!text||isSending)return;
+if(!text||isSending||!currentUser)return;
 
 showPage("chat");
 welcome.style.display="none";
@@ -261,26 +611,42 @@ promptBox.value="";
 promptBox.style.height="auto";
 isSending=true;
 sendButton.disabled=true;
+
 const loading=addMessage("CLARIO is thinking...","assistant");
 
 try{
+if(!currentConversation){
+const title=text.length>45?text.slice(0,45)+"...":text;
+await createConversation(title);
+}
+
+await saveMessage("user",text);
+
 const response=await fetch("/api/chat",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({message:text,history:chatHistory})
 });
+
 const data=await response.json();
 if(!response.ok)throw new Error(data.error||"AI request failed");
 if(!data.reply)throw new Error("No AI response received");
+
 loading.textContent=data.reply;
+await saveMessage("assistant",data.reply);
+
 chatHistory.push(
 {role:"user",content:text},
 {role:"assistant",content:data.reply}
 );
+
+await loadConversations();
+
 }catch(error){
 console.error(error);
-loading.textContent="CLARIO could not connect to its AI service. Please try again.";
+loading.textContent="CLARIO could not complete this request. Please try again. Error: "+error.message;
 }
+
 isSending=false;
 sendButton.disabled=false;
 promptBox.focus();
@@ -299,14 +665,6 @@ promptBox.value=text;
 sendMessage();
 }
 
-function newChat(){
-messages.innerHTML="";
-chatHistory=[];
-welcome.style.display="block";
-showPage("chat");
-promptBox.value="";
-}
-
 promptBox.addEventListener("keydown",function(event){
 if(event.key==="Enter"&&!event.shiftKey){
 event.preventDefault();
@@ -318,7 +676,9 @@ promptBox.addEventListener("input",function(){
 this.style.height="auto";
 this.style.height=Math.min(this.scrollHeight,130)+"px";
 });
+
+/* STARTUP */
+checkSession();
 </script>
 </body>
 </html>
-
