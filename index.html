@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#10111b">
+<title>CLARIO AI</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+ margin:0;
+ background:#10111b;
+ color:#f5f5fa;
+ font-family:Arial,sans-serif;
+ height:100dvh;
+ overflow:hidden;
+}
+
+.app{
+ display:flex;
+ height:100dvh;
+}
+
+.sidebar{
+ width:255px;
+ background:#171825;
+ padding:20px 14px;
+ display:flex;
+ flex-direction:column;
+ border-right:1px solid #292a3b;
+}
+
+.brand{
+ font-size:25px;
+ font-weight:bold;
+ letter-spacing:2px;
+ color:#a99aff;
+ padding:8px;
+}
+
+.brand small{
+ display:block;
+ color:#77788c;
+ font-size:10px;
+ letter-spacing:3px;
+ margin-top:5px;
+}
+
+.newchat{
+ background:#8170e9;
+ color:white;
+ border:0;
+ padding:13px;
+ border-radius:10px;
+ margin:25px 0;
+ font-weight:bold;
+}
+
+.navtitle{
+ color:#77788c;
+ font-size:11px;
+ margin:15px 8px 8px;
+}
+
+.navitem{
+ padding:12px;
+ border-radius:9px;
+ color:#c7c7d5;
+ margin:3px 0;
+ font-size:14px;
+}
+
+.navitem.active{
+ background:#29263f;
+ color:#b9aaff;
+}
+
+.sidebarbottom{
+ margin-top:auto;
+ padding:12px;
+ color:#9999ad;
+ font-size:12px;
+}
+
+.main{
+ flex:1;
+ display:flex;
+ flex-direction:column;
+ min-width:0;
+}
+
+.topbar{
+ height:65px;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ padding:0 20px;
+ border-bottom:1px solid #292a3b;
+}
+
+.topbar strong{font-size:15px}
+.version{color:#88899c;font-size:11px}
+
+.messages{
+ flex:1;
+ overflow-y:auto;
+ padding:25px 16px;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+}
+
+.welcome{
+ text-align:center;
+ margin:auto 0;
+ max-width:550px;
+}
+
+.logo{
+ width:65px;
+ height:65px;
+ border-radius:20px;
+ display:grid;
+ place-items:center;
+ margin:auto;
+ background:linear-gradient(135deg,#8170e9,#3e9edb);
+ font-size:29px;
+ font-weight:bold;
+}
+
+.welcome h1{
+ font-size:30px;
+ margin:22px 0 8px;
+}
+
+.welcome p{
+ color:#9697aa;
+ font-size:14px;
+ line-height:1.6;
+}
+
+.suggestions{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:10px;
+ margin-top:25px;
+}
+
+.suggestion{
+ background:#1a1c2b;
+ border:1px solid #303146;
+ color:#c9c9d8;
+ border-radius:12px;
+ padding:14px;
+ text-align:left;
+ font-size:12px;
+}
+
+.conversation{
+ width:100%;
+ max-width:720px;
+}
+
+.message{
+ padding:15px;
+ margin:12px 0;
+ border-radius:14px;
+ line-height:1.6;
+ font-size:14px;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+
+.user{
+ background:#302b50;
+ margin-left:auto;
+ max-width:85%;
+}
+
+.assistant{
+ background:#1c2030;
+ margin-right:auto;
+ max-width:95%;
+}
+
+.composerarea{
+ padding:12px 16px 20px;
+}
+
+.composer{
+ max-width:720px;
+ margin:auto;
+ background:#1b1d2c;
+ border:1px solid #3a3b51;
+ border-radius:16px;
+ padding:10px;
+}
+
+textarea{
+ width:100%;
+ resize:none;
+ min-height:45px;
+ max-height:130px;
+ background:transparent;
+ border:0;
+ outline:none;
+ color:white;
+ padding:10px;
+ font:14px Arial;
+}
+
+.composerbottom{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ padding:5px;
+}
+
+.hint{
+ color:#77788c;
+ font-size:10px;
+}
+
+.send{
+ background:#8170e9;
+ color:white;
+ border:0;
+ border-radius:10px;
+ padding:11px 18px;
+ font-weight:bold;
+}
+
+.disclaimer{
+ text-align:center;
+ color:#77788c;
+ font-size:10px;
+ margin-top:10px;
+}
+
+.mobilebrand{display:none}
+
+@media(max-width:650px){
+ .sidebar{display:none}
+ .mobilebrand{display:block;color:#a99aff;font-weight:bold}
+ .topbar{padding:0 14px}
+ .welcome h1{font-size:25px}
+ .suggestions{grid-template-columns:1fr 1fr}
+ .composerarea{padding:10px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<aside class="sidebar">
+ <div class="brand">
+  CLARIO
+  <small>ARTIFICIAL INTELLIGENCE</small>
+ </div>
+
+ <button class="newchat" onclick="newChat()">＋ New conversation</button>
+
+ <div class="navtitle">WORKSPACE</div>
+ <div class="navitem active">✦ AI Chat</div>
+ <div class="navitem">⌘ Code Assistant</div>
+ <div class="navitem">◈ Research</div>
+ <div class="navitem">▧ Documents</div>
+ <div class="navitem">✧ AI Studio</div>
+ <div class="navitem">◎ Voice Assistant</div>
+
+ <div class="sidebarbottom">
+  A ZELQORA TECHNOLOGIES PRODUCT<br><br>
+  CLARIO AI · Version 1.0
+ </div>
+</aside>
+
+<main class="main">
+
+ <header class="topbar">
+  <strong class="mobilebrand">✦ CLARIO AI</strong>
+  <strong class="desktopbrand">AI Assistant</strong>
+  <span class="version">PREVIEW 1.0</span>
+ </header>
+
+ <section class="messages" id="messages">
+
+  <div class="welcome" id="welcome">
+   <div class="logo">C</div>
+   <h1>Welcome to CLARIO.</h1>
+   <p>Your intelligent workspace starts here.<br>
+   Ask questions, explore ideas and create something amazing.</p>
+
+   <div class="suggestions">
+    <button class="suggestion" onclick="suggest('Teach me something interesting today.')">
+     ✦ Learn something new
+    </button>
+    <button class="suggestion" onclick="suggest('Help me write a JavaScript program.')">
+     ⌘ Write some code
+    </button>
+    <button class="suggestion" onclick="suggest('Help me organise my day.')">
+     ◷ Plan my day
+    </button>
+    <button class="suggestion" onclick="suggest('Explain a difficult topic simply.')">
+     ◈ Explain a topic
+    </button>
+   </div>
+  </div>
+
+  <div class="conversation" id="conversation"></div>
+
+ </section>
+
+ <section class="composerarea">
+  <div class="composer">
+   <textarea id="prompt" placeholder="Message CLARIO..." rows="1"></textarea>
+   <div class="composerbottom">
+    <span class="hint">CLARIO AI · Your intelligent assistant</span>
+    <button class="send" onclick="sendMessage()">Send ↑</button>
+   </div>
+  </div>
+  <div class="disclaimer">
+   AI can make mistakes. Verify important information.
+  </div>
+ </section>
+
+</main>
+</div>
+
+<script>
+const promptBox=document.getElementById("prompt");
+const conversation=document.getElementById("conversation");
+const welcome=document.getElementById("welcome");
+
+function addMessage(text,type){
+ const message=document.createElement("div");
+ message.className="message "+type;
+ message.textContent=text;
+ conversation.appendChild(message);
+ document.getElementById("messages").scrollTop=
+ document.getElementById("messages").scrollHeight;
+}
+
+function sendMessage(){
+ const text=promptBox.value.trim();
+ if(!text)return;
+
+ welcome.style.display="none";
+ addMessage(text,"user");
+ promptBox.value="";
+
+ setTimeout(()=>{
+  addMessage(
+   "I'm currently in preview mode. My real AI model has not been connected yet. Once we connect CLARIO's secure AI backend, I'll be able to answer your questions intelligently.",
+   "assistant"
+  );
+ },500);
+}
+
+function suggest(text){
+ promptBox.value=text;
+ sendMessage();
+}
+
+function newChat(){
+ conversation.innerHTML="";
+ welcome.style.display="block";
+ promptBox.value="";
+}
+
+promptBox.addEventListener("keydown",function(e){
+ if(e.key==="Enter"&&!e.shiftKey){
+  e.preventDefault();
+  sendMessage();
+ }
+});
+</script>
+</body>
+</html>
