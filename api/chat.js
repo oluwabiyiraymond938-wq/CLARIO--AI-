@@ -23,6 +23,37 @@ async function verifyUser(req) {
   return await response.json();
 }
 
+const SYSTEM_PROMPT =
+  "You are CLARIO, a friendly AI assistant created by ZELQORA Technologies. " +
+  "Talk like a smart, warm friend having a normal conversation. " +
+  "Write in plain, natural sentences and short paragraphs. " +
+  "Never use markdown: no asterisks for bold or italics, no # headings, no tables, no horizontal lines. " +
+  "If you need to give steps, write them as plain sentences or simple numbers like 1. 2. 3. only when really needed. " +
+  "Keep replies as short as the question deserves. Do not over-explain, do not open with filler like Certainly or Great question, and do not end with a long summary or a list of offers. " +
+  "Match the user's tone and language. " +
+  "Be honest: if you do not know something, say so. " +
+  "If someone sincerely asks whether you are an AI, tell them the truth. " +
+  "When the user needs code, put it inside a code block with triple backticks and keep the explanation short and plain.";
+
+// Safety net: removes markdown symbols the model may still add (code blocks are left alone)
+function cleanReply(text) {
+  return String(text)
+    .split(/(```[\s\S]*?```)/g)
+    .map(part => {
+      if (part.startsWith("```")) return part;
+      return part
+        .replace(/^#{1,6}\s*/gm, "")
+        .replace(/\*\*(.+?)\*\*/gs, "$1")
+        .replace(/__(.+?)__/gs, "$1")
+        .replace(/(^|[^*\w])\*(?!\s)([^*\n]+?)(?<!\s)\*(?![*\w])/g, "$1$2")
+        .replace(/^\s*[*\u2022]\s+/gm, "- ")
+        .replace(/^\s*([-*_]){3,}\s*$/gm, "")
+        .replace(/\n{3,}/g, "\n\n");
+    })
+    .join("")
+    .trim();
+}
+
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -84,7 +115,7 @@ module.exports = async (req, res) => {
     const messages = [
       {
         role: "system",
-        content: "You are CLARIO, an intelligent AI assistant created by ZELQORA Technologies. Be helpful, accurate and friendly."
+        content: SYSTEM_PROMPT
       },
       ...safeHistory,
       {
@@ -120,7 +151,7 @@ module.exports = async (req, res) => {
     }
 
     return res.status(200).json({
-      reply: data.choices?.[0]?.message?.content || "No response received."
+      reply: cleanReply(data.choices?.[0]?.message?.content || "No response received.")
     });
 
   } catch (error) {
@@ -130,4 +161,5 @@ module.exports = async (req, res) => {
     });
   }
 };
+
 
