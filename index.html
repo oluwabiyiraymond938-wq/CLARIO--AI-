@@ -287,9 +287,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
           </div>
         </div>
       </div>
-    </section>
-
-    <!-- CODE ASSISTANT -->
+    </section>    <!-- CODE ASSISTANT -->
     <section class="page" id="page-code">
       <div class="workspace-page">
         <div class="page-intro">
@@ -418,7 +416,9 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
       </div>
     </section>
   </main>
-</div><div class="auth-screen" id="authScreen">
+</div>
+
+<div class="auth-screen" id="authScreen">
   <div class="auth-card">
     <div class="auth-logo">C</div>
     <h1>CLARIO AI</h1>
@@ -426,6 +426,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 
     <div id="loginForm">
       <h2>Welcome back</h2>
+
       <label for="loginEmail">Email address</label>
       <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
 
@@ -442,6 +443,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 
     <div id="signupForm" hidden>
       <h2>Create your account</h2>
+
       <label for="signupName">Your name</label>
       <input type="text" id="signupName" placeholder="Full name" autocomplete="name">
 
@@ -460,6 +462,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 
     <div id="resetForm" hidden>
       <h2>Reset password</h2>
+
       <label for="resetEmail">Email address</label>
       <input type="email" id="resetEmail" placeholder="you@example.com">
 
@@ -492,7 +495,6 @@ let currentConversation = null;
 let conversations = [];
 let chatHistory = [];
 let busy = false;
-
 let recognition = null;
 let voiceRecognition = null;
 let voiceMode = false;
@@ -506,6 +508,16 @@ let documentPDFText = "";
 let documentPDFName = "";
 
 const $ = id => document.getElementById(id);
+
+/* LOGIN TOKEN FOR /api CALLS */
+
+async function authHeaders() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  return {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + (session?.access_token || "")
+  };
+}
 
 function authNotice(message, success = false) {
   const el = $("authNotice");
@@ -855,7 +867,7 @@ async function saveMessage(role, content) {
   if (!currentConversation || !currentUser) return;
   const { error } = await supabaseClient.from("messages")
     .insert({ conversation_id: currentConversation, user_id: currentUser.id, role, content });
-  if (error) { console.error("Message save error:", error); throw error; }  if (error) throw error;
+  if (error) { console.error("Message save error:", error); throw error; }
 }
 
 async function openConversation(id) {
@@ -893,9 +905,7 @@ async function openConversation(id) {
   renderTabs();
   renderHistory();
   showPage("chat");
-}
-
-async function sendMessage() {
+}async function sendMessage() {
   if (busy) return;
 
   const input = $("userInput");
@@ -945,7 +955,7 @@ async function sendMessage() {
 
     const response = await fetch("/api/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: await authHeaders(),
       body: JSON.stringify({
         message: finalMessage,
         history
@@ -1061,9 +1071,7 @@ function removePDF() {
   $("pdfName").textContent = "";
   $("removePDF").hidden = true;
   $("pdfInput").value = "";
-}
-
-/* DOCUMENT ASSISTANT */
+}/* DOCUMENT ASSISTANT */
 
 async function handleDocumentPDF(file) {
   if (!file) return;
@@ -1156,7 +1164,7 @@ async function generateImage() {
   try {
     const response = await fetch("/api/image", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: await authHeaders(),
       body: JSON.stringify({
         prompt,
         size: $("imageSize").value
@@ -1244,9 +1252,7 @@ function speakText(text) {
   utterance.pitch = 1;
 
   window.speechSynthesis.speak(utterance);
-}
-
-/* VOICE ASSISTANT */
+}/* VOICE ASSISTANT */
 
 function toggleVoiceAssistant() {
   if (voiceMode) {
@@ -1303,7 +1309,7 @@ async function sendVoiceMessage(message) {
   try {
     const response = await fetch("/api/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: await authHeaders(),
       body: JSON.stringify({
         message,
         history: chatHistory.slice(-10)
