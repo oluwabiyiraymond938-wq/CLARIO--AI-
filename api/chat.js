@@ -79,7 +79,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    const { message, history = [] } = req.body || {};
+    const { message, history = [], stream: wantsStream = false } = req.body || {};
 
     if (!message || typeof message !== "string") {
       return res.status(400).json({
@@ -136,10 +136,59 @@ module.exports = async (req, res) => {
         body: JSON.stringify({
           model,
           messages,
-          temperature: 0.7
+          temperature: 0.7,
+          stream: wantsStream === true
         })
       }
     );
+
+    // Streaming: send the reply to the browser piece by piece
+    if (wantsStream === true) {
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => "");
+        console.error("CLARIO provider error:", response.status, errorText);
+        return res.status(502).json({ error: "AI provider request failed." });
+      }
+
+      res.writeHead(200, {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache, no-transform",
+        "X-Accel-Buffering": "no"
+      });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop();
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith("data:")) continue;
+
+            const payload = trimmed.slice(5).trim();
+            if (payload === "[DONE]") continue;
+
+            try {
+              const json = JSON.parse(payload);
+              const piece = json.choices?.[0]?.delta?.content;
+              if (piece) res.write(piece);
+            } catch (parseError) {}
+          }
+        }
+      } catch (streamError) {
+        console.error("CLARIO stream error:", streamError);
+      }
+
+      return res.end();
+    }
 
     const data = await response.json();
 
@@ -161,5 +210,6 @@ module.exports = async (req, res) => {
     });
   }
 };
+
 
 
