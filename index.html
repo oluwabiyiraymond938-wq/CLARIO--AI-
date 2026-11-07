@@ -1390,6 +1390,280 @@ async function initialiseClario() {
 }
 
 document.addEventListener("DOMContentLoaded", initialiseClario);
+</script><style>
+.code-block{margin:10px 0;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#0a1120;white-space:normal}
+.code-head{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#162137;font-size:10px;color:#9fb0cf}
+.code-head button{background:rgba(120,140,190,.18);color:#cbd7ef;border:1px solid var(--border);padding:4px 9px;border-radius:6px;font-size:10px}
+.code-block pre{margin:0;padding:12px;overflow-x:auto;white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.55;color:#e6edff}
+.msg-text{white-space:pre-wrap}
+</style>
+<script>
+/* CLARIO UPGRADE: streaming replies, code blocks with Copy, plain-text cleanup */
+
+function cleanPlain(text) {
+  return String(text)
+    .replace(/^#{1,6}\s*/gm, "")
+    .replace(/\*\*(.+?)\*\*/gs, "$1")
+    .replace(/__(.+?)__/gs, "$1")
+    .replace(/(^|[^*\w])\*(?!\s)([^*\n]+?)(?<!\s)\*(?![*\w])/g, "$1$2")
+    .replace(/^\s*[*\u2022]\s+/gm, "- ")
+    .replace(/^\s*([-*_]){3,}\s*$/gm, "")
+    .replace(/\n{3,}/g, "\n\n");
+}
+
+function cleanKeepCode(text) {
+  return String(text)
+    .split("```")
+    .map((part, i) => (i % 2 === 0 ? cleanPlain(part) : part))
+    .join("```");
+}
+
+function spokenText(text) {
+  return String(text)
+    .split("```")
+    .filter((part, i) => i % 2 === 0)
+    .map(cleanPlain)
+    .join(" ");
+}
+
+function makeCodeBlock(lang, code) {
+  const box = document.createElement("div");
+  box.className = "code-block";
+
+  const head = document.createElement("div");
+  head.className = "code-head";
+
+  const label = document.createElement("span");
+  label.textContent = lang || "code";
+
+  const copy = document.createElement("button");
+  copy.textContent = "Copy";
+  copy.onclick = () => {
+    navigator.clipboard.writeText(code)
+      .then(() => {
+        copy.textContent = "Copied";
+        setTimeout(() => { copy.textContent = "Copy"; }, 1500);
+      })
+      .catch(() => alert("Could not copy this code."));
+  };
+
+  head.append(label, copy);
+
+  const pre = document.createElement("pre");
+  const inner = document.createElement("code");
+  inner.textContent = code;
+  pre.appendChild(inner);
+
+  box.append(head, pre);
+  return box;
+}
+
+function renderRich(container, text) {
+  container.textContent = "";
+  const parts = String(text).split("```");
+
+  parts.forEach((part, i) => {
+    if (i % 2 === 0) {
+      const plain = cleanPlain(part).replace(/^\n+|\n+$/g, "");
+      if (plain) {
+        const block = document.createElement("div");
+        block.className = "msg-text";
+        block.textContent = plain;
+        container.appendChild(block);
+      }
+      return;
+    }
+
+    const isOpen = i === parts.length - 1;
+    const newline = part.indexOf("\n");
+    let lang = "";
+    let code = part;
+
+    if (newline !== -1) {
+      const firstLine = part.slice(0, newline).trim();
+      if (firstLine.length < 20 && !/\s/.test(firstLine)) {
+        lang = firstLine;
+        code = part.slice(newline + 1);
+      }
+    } else if (isOpen) {
+      lang = part.trim();
+      code = "";
+    }
+
+    container.appendChild(makeCodeBlock(lang, code.replace(/\n$/, "")));
+  });
+}
+
+function addMessage(role, content) {
+  const welcome = $("welcome");
+  if (welcome) welcome.remove();
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "message " + (role === "user" ? "user-message" : "assistant-message");
+  wrapper._text = content;
+
+  const label = document.createElement("div");
+  label.className = "message-label";
+  label.textContent = role === "user" ? "You" : "CLARIO AI";
+
+  const body = document.createElement("div");
+  body.className = "message-content";
+
+  if (role === "assistant") renderRich(body, content);
+  else body.textContent = content;
+
+  wrapper.append(label, body);
+
+  if (role === "assistant") {
+    const actions = document.createElement("div");
+    actions.className = "message-actions";
+
+    const copy = document.createElement("button");
+    copy.textContent = "Copy";
+    copy.onclick = () => {
+      navigator.clipboard.writeText(cleanKeepCode(wrapper._text))
+        .then(() => { copy.textContent = "Copied"; })
+        .catch(() => alert("Could not copy this response."));
+    };
+
+    const listen = document.createElement("button");
+    listen.textContent = "Listen";
+    listen.onclick = () => speakText(spokenText(wrapper._text));
+
+    actions.append(copy, listen);
+    wrapper.appendChild(actions);
+  }
+
+  $("messages").appendChild(wrapper);
+  $("messages").scrollTop = $("messages").scrollHeight;
+  return wrapper;
+}
+
+async function sendMessage() {
+  if (busy) return;
+
+  const input = $("userInput");
+  const message = input.value.trim();
+
+  if (!message && !attachedPDFText) return;
+
+  if (!currentUser) {
+    alert("Please log in first.");
+    return;
+  }
+
+  let finalMessage = message;
+
+  if (attachedPDFText) {
+    finalMessage +=
+      "\n\nAttached PDF: " + attachedPDFName +
+      "\n\nPDF CONTENT:\n" + attachedPDFText.slice(0, 30000);
+  }
+
+  input.value = "";
+  input.style.height = "auto";
+
+  addMessage("user", message || "Please analyse my attached PDF.");
+
+  if (!currentConversation) {
+    try {
+      await createConversation(message || "PDF analysis");
+    } catch (error) {
+      alert("Could not create conversation: " + error.message);
+      return;
+    }
+  }
+
+  busy = true;
+  $("sendButton").disabled = true;
+
+  const typing = showTyping();
+  let bubble = null;
+
+  try {
+    await saveMessage("user", finalMessage);
+
+    const history = chatHistory.slice(-10).map(m => ({
+      role: m.role,
+      content: m.content
+    }));
+
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: await authHeaders(),
+      body: JSON.stringify({ message: finalMessage, history, stream: true })
+    });
+
+    if (!response.ok) {
+      let errorMessage = "CLARIO could not respond.";
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch (e) {}
+      throw new Error(errorMessage);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let reply = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      reply += decoder.decode(value, { stream: true });
+
+      if (!bubble) {
+        typing.remove();
+        bubble = addMessage("assistant", reply);
+      } else {
+        bubble._text = reply;
+        renderRich(bubble.querySelector(".message-content"), reply);
+      }
+
+      $("messages").scrollTop = $("messages").scrollHeight;
+    }
+
+    reply += decoder.decode();
+
+    if (!reply.trim()) {
+      throw new Error("CLARIO returned an empty response.");
+    }
+
+    if (bubble) {
+      bubble._text = reply;
+      renderRich(bubble.querySelector(".message-content"), reply);
+    } else {
+      typing.remove();
+      bubble = addMessage("assistant", reply);
+    }
+
+    chatHistory.push(
+      { role: "user", content: finalMessage },
+      { role: "assistant", content: reply }
+    );
+
+    await saveMessage("assistant", reply);
+
+    attachedPDFText = "";
+    attachedPDFName = "";
+    $("pdfName").textContent = "";
+    $("removePDF").hidden = true;
+    $("pdfInput").value = "";
+
+    await loadConversations();
+
+  } catch (error) {
+    typing.remove();
+    addMessage("assistant", "Sorry, something went wrong: " + error.message);
+
+  } finally {
+    busy = false;
+    $("sendButton").disabled = false;
+    input.focus();
+  }
+}
 </script>
+
 </body>
 </html>
