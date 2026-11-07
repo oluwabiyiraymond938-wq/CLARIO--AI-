@@ -1397,8 +1397,20 @@ document.addEventListener("DOMContentLoaded", initialiseClario);
 .code-block pre{margin:0;padding:12px;overflow-x:auto;white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.55;color:#e6edff}
 .msg-text{white-space:pre-wrap}
 </style>
+<script><style>
+.code-block{margin:10px 0;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#0a1120;white-space:normal}
+.code-head{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#162137;font-size:10px;color:#9fb0cf}
+.code-head button{background:rgba(120,140,190,.18);color:#cbd7ef;border:1px solid var(--border);padding:4px 9px;border-radius:6px;font-size:10px}
+.code-block pre{margin:0;padding:12px;overflow-x:auto;white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.55;color:#e6edff}
+.msg-text{white-space:pre-wrap}
+</style>
 <script>
-/* CLARIO UPGRADE: streaming replies, code blocks with Copy, plain-text cleanup */
+/* CLARIO UPGRADE v2: streaming, code blocks, page styles, PDF fix, saved voice chats, stop and retry */
+
+let chatMode = "chat";
+let currentAbort = null;
+
+/* ---------- text cleanup and rendering ---------- */
 
 function cleanPlain(text) {
   return String(text)
@@ -1494,7 +1506,16 @@ function renderRich(container, text) {
   });
 }
 
-function addMessage(role, content) {
+/* ---------- messages ---------- */
+
+function updateRetryButtons() {
+  const buttons = document.querySelectorAll("#messages .retry-btn");
+  buttons.forEach((button, i) => {
+    button.hidden = i !== buttons.length - 1;
+  });
+}
+
+function addMessage(role, content, options = {}) {
   const welcome = $("welcome");
   if (welcome) welcome.remove();
 
@@ -1531,58 +1552,42 @@ function addMessage(role, content) {
     listen.onclick = () => speakText(spokenText(wrapper._text));
 
     actions.append(copy, listen);
+
+    if (!options.error) {
+      const retry = document.createElement("button");
+      retry.className = "retry-btn";
+      retry.textContent = "Retry";
+      retry.onclick = () => retryLast(wrapper);
+      actions.append(retry);
+    }
+
     wrapper.appendChild(actions);
   }
 
   $("messages").appendChild(wrapper);
+  updateRetryButtons();
   $("messages").scrollTop = $("messages").scrollHeight;
   return wrapper;
 }
 
-async function sendMessage() {
-  if (busy) return;
+/* ---------- chat: send, stream, stop, retry ---------- */
 
-  const input = $("userInput");
-  const message = input.value.trim();
-
-  if (!message && !attachedPDFText) return;
-
-  if (!currentUser) {
-    alert("Please log in first.");
-    return;
-  }
-
-  let finalMessage = message;
-
-  if (attachedPDFText) {
-    finalMessage +=
-      "\n\nAttached PDF: " + attachedPDFName +
-      "\n\nPDF CONTENT:\n" + attachedPDFText.slice(0, 30000);
-  }
-
-  input.value = "";
-  input.style.height = "auto";
-
-  addMessage("user", message || "Please analyse my attached PDF.");
-
-  if (!currentConversation) {
-    try {
-      await createConversation(message || "PDF analysis");
-    } catch (error) {
-      alert("Could not create conversation: " + error.message);
-      return;
-    }
-  }
-
+async function runChat(finalMessage, mode) {
   busy = true;
   $("sendButton").disabled = true;
 
+  const stopButton = $("stopButton");
+  if (stopButton) stopButton.hidden = false;
+
   const typing = showTyping();
+  const controller = new AbortController();
+  currentAbort = controller;
+
   let bubble = null;
+  let reply = "";
+  let aborted = false;
 
   try {
-    await saveMessage("user", finalMessage);
-
     const history = chatHistory.slice(-10).map(m => ({
       role: m.role,
       content: m.content
@@ -1591,7 +1596,8 @@ async function sendMessage() {
     const response = await fetch("/api/chat", {
       method: "POST",
       headers: await authHeaders(),
-      body: JSON.stringify({ message: finalMessage, history, stream: true })
+      body: JSON.stringify({ message: finalMessage, history, stream: true, mode }),
+      signal: controller.signal
     });
 
     if (!response.ok) {
@@ -1605,13 +1611,22 @@ async function sendMessage() {
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
-    let reply = "";
 
     while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+      let chunk;
+      try {
+        chunk = await reader.read();
+      } catch (readError) {
+        if (readError.name === "AbortError") {
+          aborted = true;
+          break;
+        }
+        throw readError;
+      }
 
-      reply += decoder.decode(value, { stream: true });
+      if (chunk.done) break;
+
+      reply += decoder.decode(chunk.value, { stream: true });
 
       if (!bubble) {
         typing.remove();
@@ -1627,7 +1642,13 @@ async function sendMessage() {
     reply += decoder.decode();
 
     if (!reply.trim()) {
-      throw new Error("CLARIO returned an empty response.");
+      typing.remove();
+      addMessage(
+        "assistant",
+        aborted ? "Stopped." : "Sorry, CLARIO returned an empty response.",
+        { error: true }
+      );
+      return false;
     }
 
     if (bubble) {
@@ -1644,25 +1665,253 @@ async function sendMessage() {
     );
 
     await saveMessage("assistant", reply);
+    await loadConversations();
+    return true;
 
+  } catch (error) {
+    typing.remove();
+
+    if (error.name === "AbortError") {
+      addMessage("assistant", "Stopped.", { error: true });
+    } else {
+      addMessage("assistant", "Sorry, something went wrong: " + error.message, { error: true });
+    }
+    return false;
+
+  } finally {
+    busy = false;
+    currentAbort = null;
+    $("sendButton").disabled = false;
+    if (stopButton) stopButton.hidden = true;
+    $("userInput").focus();
+  }
+}
+
+async function sendMessage() {
+  if (busy) return;
+
+  const input = $("userInput");
+  const message = input.value.trim();
+
+  if (!message && !attachedPDFText) return;
+
+  if (!currentUser) {
+    alert("Please log in first.");
+    return;
+  }
+
+  let finalMessage = message;
+  let displayText = message || "Please analyse my attached PDF.";
+  let mode = chatMode;
+  const hadPDF = Boolean(attachedPDFText);
+
+  if (hadPDF) {
+    finalMessage +=
+      "\n\nAttached PDF: " + attachedPDFName +
+      "\n\nPDF CONTENT:\n" + attachedPDFText.slice(0, 30000);
+    displayText += "\n\n📎 " + attachedPDFName;
+    mode = "documents";
+  }
+
+  input.value = "";
+  input.style.height = "auto";
+
+  addMessage("user", displayText);
+
+  if (!currentConversation) {
+    try {
+      await createConversation(message || "PDF analysis");
+    } catch (error) {
+      alert("Could not create conversation: " + error.message);
+      return;
+    }
+  }
+
+  try {
+    // Only the short text is saved, so reloaded chats stay clean
+    await saveMessage("user", displayText);
+  } catch (error) {
+    addMessage("assistant", "Sorry, something went wrong: " + error.message, { error: true });
+    return;
+  }
+
+  const ok = await runChat(finalMessage, mode);
+
+  if (ok && hadPDF) {
     attachedPDFText = "";
     attachedPDFName = "";
     $("pdfName").textContent = "";
     $("removePDF").hidden = true;
     $("pdfInput").value = "";
-
-    await loadConversations();
-
-  } catch (error) {
-    typing.remove();
-    addMessage("assistant", "Sorry, something went wrong: " + error.message);
-
-  } finally {
-    busy = false;
-    $("sendButton").disabled = false;
-    input.focus();
   }
 }
+
+async function deleteLastAssistantRow() {
+  try {
+    if (!currentConversation || !currentUser) return;
+
+    const { data } = await supabaseClient
+      .from("messages")
+      .select("id")
+      .eq("conversation_id", currentConversation)
+      .eq("user_id", currentUser.id)
+      .eq("role", "assistant")
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    if (data && data[0]) {
+      await supabaseClient
+        .from("messages")
+        .delete()
+        .eq("id", data[0].id)
+        .eq("user_id", currentUser.id);
+    }
+  } catch (error) {
+    console.error("Could not remove the old reply:", error);
+  }
+}
+
+async function retryLast(bubble) {
+  if (busy) return;
+  if (chatHistory.length < 2) return;
+
+  const last = chatHistory[chatHistory.length - 1];
+  const previous = chatHistory[chatHistory.length - 2];
+
+  if (last.role !== "assistant" || previous.role !== "user") return;
+
+  if (bubble && bubble.remove) bubble.remove();
+  chatHistory.splice(-2, 2);
+  updateRetryButtons();
+
+  await deleteLastAssistantRow();
+
+  const ok = await runChat(previous.content, chatMode);
+
+  if (!ok) chatHistory.push(previous, last);
+}
+
+/* ---------- page styles ---------- */
+
+function askFromTool(inputId, page) {
+  const promptText = $(inputId).value.trim();
+  if (!promptText) return alert("Enter your request first.");
+
+  const modes = { codePrompt: "code", researchPrompt: "research", learnPrompt: "learn" };
+  chatMode = modes[inputId] || "chat";
+
+  $("userInput").value = promptText;
+  showPage(page);
+  sendMessage();
+}
+
+function analyseDocument() {
+  if (!documentPDFText) {
+    alert("Please upload a readable PDF first.");
+    return;
+  }
+
+  const instruction =
+    $("documentPrompt").value.trim() ||
+    "Analyse this document and explain its important points.";
+
+  attachedPDFText = documentPDFText;
+  attachedPDFName = documentPDFName;
+  chatMode = "documents";
+
+  $("userInput").value = instruction;
+
+  showPage("chat");
+  sendMessage();
+}
+
+const _originalNewChat = newChat;
+newChat = async function () {
+  chatMode = "chat";
+  return _originalNewChat.apply(this, arguments);
+};
+
+const _originalOpenConversation = openConversation;
+openConversation = async function () {
+  chatMode = "chat";
+  return _originalOpenConversation.apply(this, arguments);
+};
+
+/* ---------- voice chats are saved ---------- */
+
+async function sendVoiceMessage(message) {
+  $("voiceStatus").textContent = "CLARIO is thinking...";
+
+  try {
+    try {
+      if (!currentConversation) await createConversation(message);
+    } catch (error) {
+      console.error("Could not create voice conversation:", error);
+    }
+
+    const history = chatHistory.slice(-10).map(m => ({
+      role: m.role,
+      content: m.content
+    }));
+
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: await authHeaders(),
+      body: JSON.stringify({ message, history, mode: "voice" })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Could not get a response.");
+    }
+
+    $("voiceStatus").textContent = data.reply;
+
+    addMessage("user", message);
+    addMessage("assistant", data.reply);
+
+    chatHistory.push(
+      { role: "user", content: message },
+      { role: "assistant", content: data.reply }
+    );
+
+    try {
+      await saveMessage("user", message);
+      await saveMessage("assistant", data.reply);
+      await loadConversations();
+    } catch (error) {
+      console.error("Could not save voice chat:", error);
+    }
+
+    speakText(spokenText(data.reply));
+
+  } catch (error) {
+    $("voiceStatus").textContent = error.message;
+
+  } finally {
+    stopVoiceAssistant();
+  }
+}
+
+/* ---------- stop button ---------- */
+
+(function addStopButton() {
+  const actions = document.querySelector(".composer-actions");
+  if (!actions || $("stopButton")) return;
+
+  const stop = document.createElement("button");
+  stop.id = "stopButton";
+  stop.className = "icon-button";
+  stop.title = "Stop";
+  stop.textContent = "■";
+  stop.hidden = true;
+  stop.onclick = () => {
+    if (currentAbort) currentAbort.abort();
+  };
+
+  actions.insertBefore(stop, $("sendButton"));
+})();
 </script>
 
 </body>
