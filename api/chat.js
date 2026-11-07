@@ -35,6 +35,19 @@ const SYSTEM_PROMPT =
   "If someone sincerely asks whether you are an AI, tell them the truth. " +
   "When the user needs code, put it inside a code block with triple backticks and keep the explanation short and plain.";
 
+const STYLE_BY_MODE = {
+  code:
+    "The user is on the Code Assistant page. Act like a senior software engineer. Give complete, working code inside code blocks, then explain briefly what it does and how to run or use it. Mention pitfalls only when they really matter. If the request is too vague to build, ask one short question first.",
+  research:
+    "The user is on the Research page. Give accurate, well organised answers. Separate what is well established from what is uncertain, and say plainly when you are not sure. Never invent sources, statistics or quotes. Suggest what the user could look up to double check important claims.",
+  learn:
+    "The user is on the Learn page. Act like a patient teacher. Start from the basics, use one simple everyday example, then build up step by step. End with one short question to check understanding.",
+  documents:
+    "The user attached a document. Base your answer on the document content. If something is not in the document, say so instead of guessing. Be specific and refer to the relevant parts briefly.",
+  voice:
+    "The user is talking to you by voice and your reply will be read aloud. Answer in one to three short, easy to say sentences. No lists and no code."
+};
+
 // Safety net: removes markdown symbols the model may still add (code blocks are left alone)
 function cleanReply(text) {
   return String(text)
@@ -79,7 +92,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    const { message, history = [], stream: wantsStream = false } = req.body || {};
+    const { message, history = [], stream: wantsStream = false, mode = "chat" } = req.body || {};
 
     if (!message || typeof message !== "string") {
       return res.status(400).json({
@@ -112,10 +125,16 @@ module.exports = async (req, res) => {
           }))
       : [];
 
+    const styleText =
+      typeof mode === "string" && Object.prototype.hasOwnProperty.call(STYLE_BY_MODE, mode)
+        ? " " + STYLE_BY_MODE[mode]
+        : "";
+    const systemPrompt = SYSTEM_PROMPT + styleText;
+
     const messages = [
       {
         role: "system",
-        content: SYSTEM_PROMPT
+        content: systemPrompt
       },
       ...safeHistory,
       {
@@ -210,6 +229,7 @@ module.exports = async (req, res) => {
     });
   }
 };
+
 
 
 
